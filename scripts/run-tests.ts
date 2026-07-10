@@ -53,9 +53,17 @@ if (shuffleArg) {
     }
 }
 
-console.log(`starting postgres container for ${files.length} test file(s)...`)
-const container = await new PostgreSqlContainer("postgres:15").start()
-const url = container.getConnectionUri()
+// With DATABASE_URL set, an externally-managed Postgres is used (e.g. one container shared
+// across many runs); otherwise a fresh testcontainer is started for this run.
+let url = process.env.DATABASE_URL
+let container: Awaited<ReturnType<PostgreSqlContainer["start"]>> | null = null
+if (url) {
+    console.log(`using external postgres for ${files.length} test file(s)`)
+} else {
+    console.log(`starting postgres container for ${files.length} test file(s)...`)
+    container = await new PostgreSqlContainer("postgres:15").start()
+    url = container.getConnectionUri()
+}
 const sql = postgres(url, { max: 1 })
 await applyMigrations(sql, join(root, "db", "migration"))
 const [clockRow] = await sql`SELECT EXTRACT(EPOCH FROM CLOCK_TIMESTAMP()) * 1000 AS db_ms`
@@ -77,5 +85,7 @@ const exitCode: number = await new Promise(resolve => {
     child.on("exit", code => resolve(code ?? 1))
 })
 
-await container.stop()
+if (container) {
+    await container.stop()
+}
 process.exit(exitCode)
