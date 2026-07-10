@@ -13,64 +13,64 @@ Single source of truth for port progress. Statuses: `pending` → `ported` → `
 
 | Kotlin file | TS file | Status |
 |---|---|---|
-| io/github/gabrielshanahan/scoop/JsonbHelper.kt | src/JsonbHelper.ts | pending |
-| io/github/gabrielshanahan/scoop/Scoop.kt | src/Scoop.ts | pending |
-| io/github/gabrielshanahan/scoop/utils.kt | src/utils.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/Action.kt | src/coroutine/Action.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/ActionInput.kt | src/coroutine/ActionInput.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/ActionTopic.kt | src/coroutine/ActionTopic.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/CooperationScope.kt | src/coroutine/CooperationScope.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/CooperationScopeIdentifier.kt | src/coroutine/CooperationScopeIdentifier.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/DistributedCoroutine.kt | src/coroutine/DistributedCoroutine.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/DistributedCoroutineIdentifier.kt | src/coroutine/DistributedCoroutineIdentifier.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/EventLoop.kt | src/coroutine/EventLoop.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/Handler.kt | src/coroutine/Handler.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/PeriodicTick.kt | src/coroutine/PeriodicTick.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/ReconcileGate.kt | src/coroutine/ReconcileGate.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/ScoopException.kt | src/coroutine/ScoopException.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/ScoopInfrastructureException.kt | src/coroutine/ScoopInfrastructureException.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/Topic.kt | src/coroutine/Topic.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/TransactionRunner.kt | src/coroutine/TransactionRunner.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/VariableName.kt | src/coroutine/VariableName.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/context/CancellationToken.kt | src/coroutine/context/CancellationToken.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/context/CooperationContext.kt | src/coroutine/context/CooperationContext.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/context/CooperationContextMap.kt | src/coroutine/context/CooperationContextMap.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/context/CooperationContextModule.kt | src/coroutine/context/CooperationContextModule.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/context/util.kt | src/coroutine/context/util.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/Capabilities.kt | src/coroutine/structuredcooperation/Capabilities.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/CooperationFailure.kt | src/coroutine/structuredcooperation/CooperationFailure.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/MessageEventRepository.kt | src/coroutine/structuredcooperation/MessageEventRepository.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/PendingCoroutineRunSql.kt | src/coroutine/structuredcooperation/PendingCoroutineRunSql.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/ReturnValueAlreadyExistsException.kt | src/coroutine/structuredcooperation/ReturnValueAlreadyExistsException.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/ReturnValueRepository.kt | src/coroutine/structuredcooperation/ReturnValueRepository.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/exceptions.kt | src/coroutine/structuredcooperation/exceptions.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/RollbackState.kt | src/coroutine/eventloop/RollbackState.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/SuspensionState.kt | src/coroutine/eventloop/SuspensionState.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/exceptions.kt | src/coroutine/eventloop/exceptions.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/deadline/AbsoluteDeadline.kt | src/coroutine/eventloop/deadline/AbsoluteDeadline.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/deadline/Deadline.kt | src/coroutine/eventloop/deadline/Deadline.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/deadline/HappyPathDeadline.kt | src/coroutine/eventloop/deadline/HappyPathDeadline.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/deadline/RollbackPathDeadline.kt | src/coroutine/eventloop/deadline/RollbackPathDeadline.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/strategy/EventLoopStrategy.kt | src/coroutine/eventloop/strategy/EventLoopStrategy.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/strategy/StandardEventLoopStrategy.kt | src/coroutine/eventloop/strategy/StandardEventLoopStrategy.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/eventloop/strategy/strategyBuilders.kt | src/coroutine/eventloop/strategy/strategyBuilders.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/continuation/Continuation.kt | src/coroutine/continuation/Continuation.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/continuation/ContinuationIdentifier.kt | src/coroutine/continuation/ContinuationIdentifier.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/continuation/CooperationContinuation.kt | src/coroutine/continuation/CooperationContinuation.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/continuation/HappyPathContinuation.kt | src/coroutine/continuation/HappyPathContinuation.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/continuation/RollbackPathContinuation.kt | src/coroutine/continuation/RollbackPathContinuation.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/builder/SagaBuilder.kt | src/coroutine/builder/SagaBuilder.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/builder/SagaBuilderExtensions.kt | src/coroutine/builder/SagaBuilderExtensions.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/builder/Sleep.kt | src/coroutine/builder/Sleep.ts | pending |
-| io/github/gabrielshanahan/scoop/coroutine/builder/TryFinally.kt | src/coroutine/builder/TryFinally.ts | pending |
-| io/github/gabrielshanahan/scoop/util/UuidV7.kt | src/util/UuidV7.ts | pending |
-| io/github/gabrielshanahan/scoop/messaging/HandlerRegistry.kt | src/messaging/HandlerRegistry.ts | pending |
-| io/github/gabrielshanahan/scoop/messaging/Message.kt | src/messaging/Message.ts | pending |
-| io/github/gabrielshanahan/scoop/messaging/MessageQueueExtensions.kt | src/messaging/MessageQueueExtensions.ts | pending |
-| io/github/gabrielshanahan/scoop/messaging/MessageRepository.kt | src/messaging/MessageRepository.ts | pending |
-| io/github/gabrielshanahan/scoop/messaging/PostgresMessageQueue.kt | src/messaging/PostgresMessageQueue.ts | pending |
-| io/github/gabrielshanahan/scoop/messaging/Subscription.kt | src/messaging/Subscription.ts | pending |
-| io/github/gabrielshanahan/scoop/messaging/TopicNotifier.kt | src/messaging/TopicNotifier.ts | pending |
+| io/github/gabrielshanahan/scoop/JsonbHelper.kt | src/JsonbHelper.ts | ported |
+| io/github/gabrielshanahan/scoop/Scoop.kt | src/Scoop.ts | ported |
+| io/github/gabrielshanahan/scoop/utils.kt | src/utils.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/Action.kt | src/coroutine/Action.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/ActionInput.kt | src/coroutine/ActionInput.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/ActionTopic.kt | src/coroutine/ActionTopic.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/CooperationScope.kt | src/coroutine/CooperationScope.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/CooperationScopeIdentifier.kt | src/coroutine/CooperationScopeIdentifier.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/DistributedCoroutine.kt | src/coroutine/DistributedCoroutine.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/DistributedCoroutineIdentifier.kt | src/coroutine/DistributedCoroutineIdentifier.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/EventLoop.kt | src/coroutine/EventLoop.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/Handler.kt | src/coroutine/Handler.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/PeriodicTick.kt | src/coroutine/PeriodicTick.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/ReconcileGate.kt | src/coroutine/ReconcileGate.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/ScoopException.kt | src/coroutine/ScoopException.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/ScoopInfrastructureException.kt | src/coroutine/ScoopInfrastructureException.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/Topic.kt | src/coroutine/Topic.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/TransactionRunner.kt | src/coroutine/TransactionRunner.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/VariableName.kt | src/coroutine/VariableName.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/context/CancellationToken.kt | src/coroutine/context/CancellationToken.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/context/CooperationContext.kt | src/coroutine/context/CooperationContext.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/context/CooperationContextMap.kt | src/coroutine/context/CooperationContextMap.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/context/CooperationContextModule.kt | src/coroutine/context/CooperationContextModule.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/context/util.kt | src/coroutine/context/util.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/Capabilities.kt | src/coroutine/structuredcooperation/Capabilities.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/CooperationFailure.kt | src/coroutine/structuredcooperation/CooperationFailure.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/MessageEventRepository.kt | src/coroutine/structuredcooperation/MessageEventRepository.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/PendingCoroutineRunSql.kt | src/coroutine/structuredcooperation/PendingCoroutineRunSql.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/ReturnValueAlreadyExistsException.kt | src/coroutine/structuredcooperation/ReturnValueAlreadyExistsException.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/ReturnValueRepository.kt | src/coroutine/structuredcooperation/ReturnValueRepository.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/exceptions.kt | src/coroutine/structuredcooperation/exceptions.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/RollbackState.kt | src/coroutine/eventloop/RollbackState.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/SuspensionState.kt | src/coroutine/eventloop/SuspensionState.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/exceptions.kt | src/coroutine/eventloop/exceptions.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/deadline/AbsoluteDeadline.kt | src/coroutine/eventloop/deadline/AbsoluteDeadline.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/deadline/Deadline.kt | src/coroutine/eventloop/deadline/Deadline.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/deadline/HappyPathDeadline.kt | src/coroutine/eventloop/deadline/HappyPathDeadline.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/deadline/RollbackPathDeadline.kt | src/coroutine/eventloop/deadline/RollbackPathDeadline.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/strategy/EventLoopStrategy.kt | src/coroutine/eventloop/strategy/EventLoopStrategy.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/strategy/StandardEventLoopStrategy.kt | src/coroutine/eventloop/strategy/StandardEventLoopStrategy.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/eventloop/strategy/strategyBuilders.kt | src/coroutine/eventloop/strategy/strategyBuilders.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/continuation/Continuation.kt | src/coroutine/continuation/Continuation.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/continuation/ContinuationIdentifier.kt | src/coroutine/continuation/ContinuationIdentifier.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/continuation/CooperationContinuation.kt | src/coroutine/continuation/CooperationContinuation.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/continuation/HappyPathContinuation.kt | src/coroutine/continuation/HappyPathContinuation.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/continuation/RollbackPathContinuation.kt | src/coroutine/continuation/RollbackPathContinuation.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/builder/SagaBuilder.kt | src/coroutine/builder/SagaBuilder.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/builder/SagaBuilderExtensions.kt | src/coroutine/builder/SagaBuilderExtensions.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/builder/Sleep.kt | src/coroutine/builder/Sleep.ts | ported |
+| io/github/gabrielshanahan/scoop/coroutine/builder/TryFinally.kt | src/coroutine/builder/TryFinally.ts | ported |
+| io/github/gabrielshanahan/scoop/util/UuidV7.kt | src/util/UuidV7.ts | ported |
+| io/github/gabrielshanahan/scoop/messaging/HandlerRegistry.kt | src/messaging/HandlerRegistry.ts | ported |
+| io/github/gabrielshanahan/scoop/messaging/Message.kt | src/messaging/Message.ts | ported |
+| io/github/gabrielshanahan/scoop/messaging/MessageQueueExtensions.kt | src/messaging/MessageQueueExtensions.ts | ported |
+| io/github/gabrielshanahan/scoop/messaging/MessageRepository.kt | src/messaging/MessageRepository.ts | ported |
+| io/github/gabrielshanahan/scoop/messaging/PostgresMessageQueue.kt | src/messaging/PostgresMessageQueue.ts | ported |
+| io/github/gabrielshanahan/scoop/messaging/Subscription.kt | src/messaging/Subscription.ts | ported |
+| io/github/gabrielshanahan/scoop/messaging/TopicNotifier.kt | src/messaging/TopicNotifier.ts | ported |
 
 ## scoop-quarkus main sources (5 files)
 
@@ -78,11 +78,11 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | Kotlin file | TS counterpart | Status |
 |---|---|---|
-| io/github/gabrielshanahan/scoop/quarkus/JtaTransactionRunner.kt | see DECISIONS.md | pending |
-| io/github/gabrielshanahan/scoop/quarkus/PgSubscriberProducer.kt | see DECISIONS.md | pending |
-| io/github/gabrielshanahan/scoop/quarkus/PgSubscriberTopicNotifier.kt | see DECISIONS.md | pending |
-| io/github/gabrielshanahan/scoop/quarkus/QuarkusCooperationContextCustomizer.kt | see DECISIONS.md | pending |
-| io/github/gabrielshanahan/scoop/quarkus/ScoopProducer.kt | see DECISIONS.md | pending |
+| io/github/gabrielshanahan/scoop/quarkus/JtaTransactionRunner.kt | see DECISIONS.md | ported |
+| io/github/gabrielshanahan/scoop/quarkus/PgSubscriberProducer.kt | see DECISIONS.md | ported |
+| io/github/gabrielshanahan/scoop/quarkus/PgSubscriberTopicNotifier.kt | see DECISIONS.md | ported |
+| io/github/gabrielshanahan/scoop/quarkus/QuarkusCooperationContextCustomizer.kt | see DECISIONS.md | ported |
+| io/github/gabrielshanahan/scoop/quarkus/ScoopProducer.kt | see DECISIONS.md | ported |
 
 ## Tests (195 test methods across 29 files, of which 4 are helpers/base classes with no @Test methods)
 

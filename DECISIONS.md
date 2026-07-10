@@ -61,9 +61,64 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   message_event, message, return_value` before each test (the original's `@BeforeEach` does the
   same), test files run sequentially.
 
+## The scoop-quarkus main-file mapping (concrete)
+
+| Kotlin file | TS counterpart |
+|---|---|
+| `ScoopProducer.kt` | `src/Scoop.ts` — `Scoop.create(sql, options)` composition root (options carry the `@ConfigProperty` knobs: tickIntervalMillis, reconcileSafetyNetMillis, retryBackoffBase/MaxMillis; the CDI disposer becomes `Scoop.close()`) |
+| `JtaTransactionRunner.kt` | `src/coroutine/TransactionRunner.ts` — the single `PostgresTransactionRunner` (`sql.begin()`) |
+| `PgSubscriberProducer.kt` | dissolved — postgres.js owns the LISTEN connection, reconnection and demux; no wiring needed |
+| `PgSubscriberTopicNotifier.kt` | `src/node/PostgresTopicNotifier.ts` (one LISTEN per topic + fan-out to registered callbacks; `queueMicrotask` replaces per-callback virtual threads) |
+| `QuarkusCooperationContextCustomizer.kt` | dissolved — context (de)serialization lives in `src/coroutine/context/CooperationContextModule.ts` and is always active via `JsonbHelper` |
+
 ## Divergences from literal translation
 
 (kept current as the port proceeds)
+
+- **Injectable clock** (`src/util/Clock.ts`): all wall-clock reads (`OffsetDateTime.now()`,
+  `System.currentTimeMillis()` in UuidV7, deadline/sleep helpers, HandlerRegistry strategy
+  creation) go through a swappable module-level clock so tests control time. Millisecond
+  precision (JS clocks expose no more); load-bearing time decisions happen in Postgres
+  (`CLOCK_TIMESTAMP()`), unchanged.
+- **Timestamps as ISO strings**: `OffsetDateTime`/`Instant` fields in context elements
+  (deadlines, SleepUntil) are ISO-8601 strings; they serialize into context JSON identically and
+  are compared via epoch parsing. `suspendedAt` (used to scope rollbacks to a tick) is carried as
+  the exact text Postgres produced — `finalSelect` casts it `::text` — and passed back with a
+  `::timestamptz` cast, so microsecond precision survives (a JS `Date` would truncate to ms and
+  break `created_at < :suspendedAt` comparisons).
+- **MappedKey carries name + reviver**: Kotlin derives the context key's serialized name from the
+  class simple name and the element type from generics reflection. TS has neither, so
+  `new MappedKey(name, reviveElement)` takes both explicitly. Same for `Topic`, `VariableName`,
+  and `Handler` names. `VariableName` keeps its polymorphic `_type` discriminator via a
+  registry + `toJSON`.
+- **Preserved quirk — rollback deadline key mismatch**: the original's rollback deadline element
+  serializes under `RollbackPathDeadlineKey` (class simple name) while the generated give-up SQL
+  checks `RollbackDeadlineKey`. Reproduced as-is; do not "fix" without also changing the ref repo.
+- **Context deserialization via JSON.parse + re-stringify**: the Kotlin module reconstructs each
+  top-level value's text from the token stream; here each value is `JSON.parse`d and re-emitted
+  with `JSON.stringify`, which is canonical w.r.t. this codec's own output. Caveat: objects with
+  *numeric-like keys* would be reordered by JS semantics (never exercised by the reference tests).
+- **`CooperationContextMap` drops the nullable ObjectMapper**: revivers live on keys; mapperless
+  maps in the original always have an empty serialized map, so behavior is identical. Kotlin
+  HashMap key semantics (mapped keys by singleton identity, unmapped by name) are reproduced via
+  an identity token.
+- **SagaBuilder overloads → two methods**: Kotlin's lambda-arity overloads become `step(spec)`
+  (simple; invoke returns void ⇒ Continue, handleChildFailures keeps the incoming nextStep) and
+  `controlledStep(spec)` (stepIteration-aware, NextStep-returning). `tryFinallyStep`,
+  `sleepForStep`, `scheduledStep`, `periodic` become free functions taking the builder.
+- **Sealed hierarchies → tagged classes**: `RollbackState`'s marker interfaces (`Me.RollingBack`,
+  `ThrowableExists`) become the `meRollingBack` flag and presence of `throwable`;
+  `SuspensionState`, `NextStep`, `ContinuationResult`, `LastStepResult` are kind-tagged unions.
+- **Threads → event-loop primitives**: the per-worker single-thread executor + semaphore becomes
+  a `setTimeout` chain (fixed-delay semantics) with a boolean tick gate (JS is single-threaded,
+  so check-and-set is atomic); `markRollingBack/markRollbackFailed…InSeparateTransaction`'s
+  spawn-thread-and-join becomes awaiting a separate pool transaction. `PeriodicTick.close()`
+  awaits the in-flight tick bounded by 10s (there is no interrupt fallback on this runtime).
+- **Named SQL parameters**: FluentJDBC `:name` parameters are preserved textually and converted
+  to positional `$n` at execution (`src/sql.ts`), keeping the ported SQL diffable against the
+  original. `uuid[]`/jsonb parameters pass as literals/JSON text with explicit casts.
+- **Suppressed exceptions**: JS has no suppressed-exception mechanism; `ScoopException` and
+  `CooperationException` carry an explicit `suppressed` array with the same aggregation rules.
 
 - **Kotlin `object` singletons** (e.g. `Topic` subclasses, `Handler` objects in tests) become
   module-level `const` instances or classes instantiated once; behavior identical.
