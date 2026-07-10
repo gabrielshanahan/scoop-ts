@@ -3,7 +3,7 @@ import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import { getEventSequence, keepOnlyHandlers, keepOnlyPrefixedBy, triple } from "../../support/util.js"
 
@@ -59,7 +59,7 @@ describe("HappyPathTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.equal(executionOrder.length, 4, "Not everything completed correctly")
             assert.deepEqual(
@@ -166,7 +166,7 @@ describe("HappyPathTest", () => {
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
 
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.equal(executionOrder.length, 7, "Not everything completed correctly")
             assert.deepEqual(
@@ -280,7 +280,7 @@ describe("HappyPathTest", () => {
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
 
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.equal(executionOrder.length, 6, "Not everything completed correctly")
 
@@ -423,7 +423,7 @@ describe("HappyPathTest", () => {
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
 
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.equal(executionOrder.length, 6, "Not everything completed correctly")
 

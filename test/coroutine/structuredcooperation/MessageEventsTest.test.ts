@@ -3,7 +3,7 @@ import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 
 const h = setupScoopTest()
@@ -155,7 +155,7 @@ describe("MessageEventsTest", () => {
 
         assert.ok(await latch.await(10_000), "Message should be processed")
 
-        await ciSleep(150)
+        await eventLogSettled(h.sql)
 
         const committedCount = await countHandlerMessageEvents(handlerName, message.id, "COMMITTED")
         assert.equal(committedCount, 1, "There should be exactly one COMMITTED event")
@@ -187,7 +187,7 @@ describe("MessageEventsTest", () => {
 
         assert.ok(await latch.await(10_000), "Message should be processed")
 
-        await ciSleep(150)
+        await eventLogSettled(h.sql)
 
         const rolledBackCount = await countHandlerMessageEvents(
             handlerName,
@@ -218,7 +218,7 @@ describe("MessageEventsTest", () => {
 
         assert.ok(await latch.await(10_000), "Message should be processed")
 
-        await ciSleep(150)
+        await eventLogSettled(h.sql)
 
         const emittedCount = await countMessageEvents(message.id, "EMITTED")
         const seenCount = await countHandlerMessageEvents(handlerName, message.id, "SEEN")
@@ -275,7 +275,7 @@ describe("MessageEventsTest", () => {
 
         assert.ok(await latch.await(10_000), "Message should be processed (and fail)")
 
-        await ciSleep(1000)
+        await eventLogSettled(h.sql)
 
         const emittedCount = await countMessageEvents(message.id, "EMITTED")
         const seenCount = await countHandlerMessageEvents(handlerName, message.id, "SEEN")
@@ -356,7 +356,7 @@ describe("MessageEventsTest", () => {
         }
 
         assert.ok(await countDownLatch.await(1_000), "All messages should be processed")
-        await ciSleep(100)
+        await eventLogSettled(h.sql)
 
         assert.equal(
             processedMessages.size,

@@ -5,7 +5,7 @@ import { periodic, scheduledStep, sleepForStep } from "../../../src/coroutine/bu
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
 import { isoFromNowMillis, nowMillis } from "../../../src/util/Clock.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import { getEventSequence, triple } from "../../support/util.js"
 
@@ -39,7 +39,7 @@ describe("SleepTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.ok(step3Time - step1Time > 500, "Sleep doesn't work")
             assert.deepEqual(await getEventSequence(h.sql), [
@@ -78,7 +78,7 @@ describe("SleepTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.ok(
                 Date.parse(scheduledStepTime) > Date.parse(startAfter),
@@ -122,7 +122,7 @@ describe("SleepTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(500)
+            await eventLogSettled(h.sql)
             assert.ok(
                 times.length === 3 &&
                     times[1]! - times[0]! > runEveryMillis &&

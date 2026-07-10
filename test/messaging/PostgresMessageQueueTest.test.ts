@@ -3,7 +3,7 @@ import { describe, test } from "node:test"
 import { saga } from "../../src/coroutine/builder/SagaBuilder.js"
 import { eventLoopStrategy } from "../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../support/harness.js"
 import { CountDownLatch } from "../support/latch.js"
 
 const h = setupScoopTest()
@@ -102,7 +102,7 @@ describe("PostgresMessageQueueTest", () => {
 
             assert.ok(await latch.await(10_000))
 
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.equal(successMessageIndex, 2)
             assert.equal(failedMessageIndex, 1)

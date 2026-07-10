@@ -4,7 +4,7 @@ import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { Continue, Repeat } from "../../../src/coroutine/DistributedCoroutine.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import { getEventSequence, triple } from "../../support/util.js"
 
@@ -43,7 +43,7 @@ describe("LoopTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -96,7 +96,7 @@ describe("LoopTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -162,7 +162,7 @@ describe("LoopTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             // Each loop iteration should wait for its children before the next iteration
             assert.deepEqual(
@@ -259,7 +259,7 @@ describe("LoopTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -336,7 +336,7 @@ describe("LoopTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // Iteration 2 threw during invoke, so its transaction rolled back and no
             // persistent state was committed. Rollback only covers committed iterations 0 and 1.
@@ -405,7 +405,7 @@ describe("LoopTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -474,7 +474,7 @@ describe("LoopTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // Flow: loop(0)→loop(1)→loop(2,Continue)→middle→failing(throws)
             // Rollback covers committed SUSPENDED steps in reverse chronological order:
@@ -568,7 +568,7 @@ describe("LoopTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // Flow: A(0)→A(1,Continue)→B(0)→B(1,Continue)→failing(throws)
             // Rollback in reverse chronological: B(1), B(0), A(1), A(0)
@@ -689,7 +689,7 @@ describe("LoopTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,

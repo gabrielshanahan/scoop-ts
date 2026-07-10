@@ -9,7 +9,7 @@ import {
 import type { CooperationScopeIdentifier } from "../../../src/coroutine/CooperationScopeIdentifier.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest, waitUntil } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest, waitUntil } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import {
     asSource,
@@ -66,7 +66,7 @@ describe("RollbackPathTest", () => {
             })
 
             assert.ok(await latch.await(10_000))
-            await ciSleep(500)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(await getEventSequence(h.sql), [
                 triple("EMITTED", null, null),
@@ -128,7 +128,7 @@ describe("RollbackPathTest", () => {
             })
 
             assert.ok(await latch.await(100_000), "Not everything completed correctly")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(await getEventSequence(h.sql), [
                 triple("EMITTED", null, null),
@@ -220,7 +220,7 @@ describe("RollbackPathTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(700)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(await getEventSequence(h.sql), [
                 triple("EMITTED", null, null),
@@ -337,7 +337,7 @@ describe("RollbackPathTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(await getEventSequence(h.sql), [
                 triple("EMITTED", null, null),
@@ -513,7 +513,7 @@ describe("RollbackPathTest", () => {
 
             assert.ok(await latch.await(10_000))
 
-            await ciSleep(750)
+            await eventLogSettled(h.sql)
 
             assert.equal(executionOrder.length, 18)
 
@@ -953,7 +953,7 @@ describe("RollbackPathTest", () => {
 
             assert.ok(await latch.await(10_000), `Latch has count ${latch.getCount()}`)
 
-            await ciSleep(750)
+            await eventLogSettled(h.sql)
 
             assert.equal(executionOrder.length, 16)
 
@@ -1461,7 +1461,7 @@ describe("RollbackPathTest", () => {
                 })
 
                 assert.ok(await latch.await(10_000), "Not everything completed correctly")
-                await ciSleep(200)
+                await eventLogSettled(h.sql)
 
                 assert.deepEqual(
                     keepOnlyHandlers(
@@ -1624,7 +1624,7 @@ describe("RollbackPathTest", () => {
                     await rollbackLatch.await(1_000),
                     "Not everything rolled back correctly",
                 )
-                await ciSleep(100)
+                await eventLogSettled(h.sql)
 
                 assert.deepEqual(await getEventSequence(h.sql), [
                     triple("EMITTED", null, null),
@@ -1713,7 +1713,7 @@ describe("RollbackPathTest", () => {
                     await rollbackLatch.await(1_000),
                     "Not everything rolled back correctly",
                 )
-                await ciSleep(100)
+                await eventLogSettled(h.sql)
 
                 assert.deepEqual(await getEventSequence(h.sql), [
                     triple("EMITTED", null, null),
@@ -1794,7 +1794,7 @@ describe("RollbackPathTest", () => {
                 rollbackEmitted.countDown()
 
                 assert.ok(await latch.await(10_000), "Not everything completed correctly")
-                await ciSleep(100)
+                await eventLogSettled(h.sql)
 
                 assert.deepEqual(await getEventSequence(h.sql), [
                     triple("EMITTED", null, null),

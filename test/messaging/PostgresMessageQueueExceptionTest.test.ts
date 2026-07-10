@@ -3,7 +3,7 @@ import { describe, test } from "node:test"
 import { saga } from "../../src/coroutine/builder/SagaBuilder.js"
 import { eventLoopStrategy } from "../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../support/harness.js"
 import { CountDownLatch } from "../support/latch.js"
 import { fetchExceptions } from "../support/util.js"
 
@@ -42,7 +42,7 @@ describe("PostgresMessageQueueExceptionTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Handler should complete")
-            await ciSleep(500)
+            await eventLogSettled(h.sql)
 
             const exceptions = await fetchExceptions(
                 h.sql,

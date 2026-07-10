@@ -5,7 +5,7 @@ import type { TransactionSql } from "postgres"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 
 const h = setupScoopTest()
@@ -80,7 +80,7 @@ describe("JtaAtomicityTest", () => {
                 await latch.await(10_000),
                 "Step did not run (a transaction-enlistment failure would prevent it)",
             )
-            await ciSleep(500)
+            await eventLogSettled(h.sql)
 
             // (a) the step ran and committed
             // (b) the business row is present
@@ -122,7 +122,7 @@ describe("JtaAtomicityTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Step did not run")
-            await ciSleep(500)
+            await eventLogSettled(h.sql)
 
             // The business write and scoop's step tx are one unit: since the step threw,
             // the business row must have been rolled back with it.

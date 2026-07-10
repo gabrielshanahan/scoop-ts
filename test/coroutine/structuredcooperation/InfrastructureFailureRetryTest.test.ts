@@ -4,7 +4,7 @@ import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { ScoopInfrastructureException } from "../../../src/coroutine/ScoopInfrastructureException.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import { getEventSequence } from "../../support/util.js"
 
@@ -109,7 +109,7 @@ describe("InfrastructureFailureRetryTest", () => {
             ) {
                 await ciSleep(200)
             }
-            await ciSleep(500)
+            await eventLogSettled(h.sql)
 
             const types = (await getEventSequence(h.sql)).map(([type]) => type)
             assert.ok(

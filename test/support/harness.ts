@@ -37,6 +37,48 @@ export async function waitUntil(
 }
 
 /**
+ * Waits (best-effort, bounded) until the event log is TERMINAL: for every cooperation lineage,
+ * the latest "start" event (SEEN or ROLLING_BACK) is followed by a terminal event
+ * (COMMITTED / ROLLED_BACK / ROLLBACK_FAILED). Comparing latest-start vs latest-terminal (not
+ * mere existence) matters for rollback requests: a lineage that COMMITTED and is later rolled
+ * back re-enters via a fresh ROLLING_BACK, and its earlier COMMITTED must not count as settled.
+ *
+ * This is the deterministic replacement for the original's fixed post-latch settle sleeps
+ * (`Thread.sleep(100)` etc.) before asserting on the final event log: the latch fires inside the
+ * last step body, but the saga's terminal event is only written on a LATER tick, so a fixed
+ * sleep races it under load (the original README acknowledges this flakiness). On timeout this
+ * returns instead of throwing, so a genuinely wrong end-state still fails through the test's own
+ * assertion with its informative diff. See DECISIONS.md.
+ */
+export async function eventLogSettled(
+    sql: Sql,
+    timeoutMillis = 15_000,
+): Promise<void> {
+    const deadline = Date.now() + timeoutMillis * CI_TIMEOUT_MULTIPLIER
+    while (Date.now() < deadline) {
+        // Event ids are UUIDv7, so max(id) per group is the latest event in wall-clock order.
+        const [row] = await sql`
+            SELECT COUNT(*)::int AS unsettled
+            FROM (
+                SELECT
+                    max(id::text) FILTER (WHERE type IN ('SEEN', 'ROLLING_BACK')) AS last_start,
+                    max(id::text) FILTER (
+                        WHERE type IN ('COMMITTED', 'ROLLED_BACK', 'ROLLBACK_FAILED')
+                    ) AS last_terminal
+                FROM message_event
+                GROUP BY cooperation_lineage
+            ) per_lineage
+            WHERE last_start IS NOT NULL
+              AND (last_terminal IS NULL OR last_terminal < last_start)
+        `
+        if (Number(row!.unsettled) === 0) {
+            return
+        }
+        await sleep(20)
+    }
+}
+
+/**
  * The per-file test fixture — the analog of the Kotlin `StructuredCooperationTest` base class
  * (DI container + @BeforeEach TRUNCATE). One postgres.js pool per test file (the container is
  * shared for the whole run; see scripts/run-tests.ts), TRUNCATE before each test with ticks

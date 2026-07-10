@@ -8,7 +8,7 @@ import {
 } from "../../../../src/coroutine/eventloop/deadline/HappyPathDeadline.js"
 import { eventLoopStrategy } from "../../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../../support/harness.js"
 import { CountDownLatch } from "../../../support/latch.js"
 import {
     asSource,
@@ -64,7 +64,7 @@ describe("DeadlineTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.ok(
                 !childStarted,

@@ -8,7 +8,7 @@ import { VariableName } from "../../../src/coroutine/VariableName.js"
 import type { JsonValue } from "../../../src/JsonbHelper.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 
 const h = setupScoopTest()
@@ -92,7 +92,7 @@ describe("ReturnValueTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             const values = retrievedValues!
             assert.ok(values, "Return values should be retrieved")
@@ -163,7 +163,7 @@ describe("ReturnValueTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             const values = retrievedValues!
             assert.ok(values, "Return values should be retrieved")
@@ -221,7 +221,7 @@ describe("ReturnValueTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.ok(specificValue, "Should find ChildHandler's return value")
             assert.ok(JSON.stringify(specificValue).includes("found"))
@@ -277,7 +277,7 @@ describe("ReturnValueTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             const testMap = testResults!
             const anotherMap = anotherResults!

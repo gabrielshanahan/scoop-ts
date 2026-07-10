@@ -4,7 +4,7 @@ import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { Continue, GoTo, NextStep, Repeat } from "../../../src/coroutine/DistributedCoroutine.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import { getEventSequence, triple } from "../../support/util.js"
 
@@ -62,7 +62,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -124,7 +124,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             // GoTo backward works: step A re-executes after GoTo(0) from step C.
             // stepIteration for second A is 0 because B and C ran in between,
@@ -183,7 +183,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(100)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -263,7 +263,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // Flow: A→B→C(GoTo(0))→A(GoTo(2))→C(fail)
             // Rollback covers committed SUSPENDED steps in reverse chronological order:
@@ -360,7 +360,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // Flow: loop-0(child)→loop-1(child)→failing(fail)
             // Rollback: failing-step has no committed SUSPENDED (it failed),
@@ -483,7 +483,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // Flow: invoke-0 (Continue) → child fails → hcf childFailureHandlerIteration=0
             // overrides to GoTo(0), launches retry child → retry child fails → hcf
@@ -599,7 +599,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // invoke returns GoTo(2), child fails, hcf receives nextStep=GoTo(2)
             // and rethrows → rollback. The nextStep proves GoTo is correctly
@@ -688,7 +688,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // Flow: A(GoTo 2)→C→D(fail)
             // Rollback: C, A (step-B was never executed, so not in rollback)
@@ -766,7 +766,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // Flow: A(GoTo 2)→C(GoTo 1)→B→C(fail)
             // Committed: A, C(1st), B. C's 2nd invoke threw, not committed.
@@ -856,7 +856,7 @@ describe("GoToTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             // Flow: A(GoTo 2)→C(iter 0, Repeat)→C(iter 1, fail)
             // Committed: A, C(iter 0). C iter 1 threw, not committed.

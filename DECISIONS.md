@@ -81,8 +81,19 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   "after everything has finished running". Under load the 100ms settle races the final commits
   (observed once under Docker disk pressure; the race exists in the Kotlin original too). The
   ports wait for the exact precondition instead — both sagas COMMITTED — via bounded polling
-  (`waitUntil`); every assertion is unchanged. Sleeps that merely settle before reading state are
-  kept as in the original.
+  (`waitUntil`); every assertion is unchanged.
+- **Fixed settle-sleeps before terminal-state assertions became terminal-quiescence polls**
+  (`eventLogSettled`): the original's pattern `latch.await()` + `Thread.sleep(100..300)` +
+  assert-on-event-log races the writes that land on the tick *after* the last step's latch fires
+  (the root's COMMITTED, parent rollback completion). Per-test soak runs reproduced this — the
+  actual log was missing exactly the final `COMMITTED`/`ROLLED_BACK` rows — and the Kotlin
+  original documents the same fragility ("some tests may be flakey... increase Thread.sleep").
+  The port polls until every started saga run (`SEEN`/`ROLLING_BACK` lineage) has a terminal
+  event (`COMMITTED`/`ROLLED_BACK`/`ROLLBACK_FAILED`), timing out silently so a genuine mismatch
+  still fails through the test's own assertion diff. Assertions are unchanged. Exceptions, kept
+  as fixed sleeps: workload sleeps inside step bodies, poll intervals inside explicit wait loops,
+  `StubHandlerBlockingTest` (its sagas never terminate — the assertions are about *absence* of
+  progress), and `PostgresMessageQueueTest`'s trailing post-assertion hygiene sleeps.
 
 ## The scoop-quarkus main-file mapping (concrete)
 

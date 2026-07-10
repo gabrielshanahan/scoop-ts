@@ -5,7 +5,7 @@ import { MappedElement, MappedKey } from "../../../src/coroutine/context/Coopera
 import { writeContextJson } from "../../../src/coroutine/context/CooperationContextModule.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 
 const h = setupScoopTest()
@@ -121,7 +121,7 @@ describe("ContextPropagationTest", () => {
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
 
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 contextValues,

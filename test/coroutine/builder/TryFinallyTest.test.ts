@@ -4,7 +4,7 @@ import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { tryFinallyStep } from "../../../src/coroutine/builder/TryFinally.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 
 const h = setupScoopTest()
@@ -67,7 +67,7 @@ describe("TryFinallyTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -122,7 +122,7 @@ describe("TryFinallyTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -193,7 +193,7 @@ describe("TryFinallyTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -261,7 +261,7 @@ describe("TryFinallyTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
@@ -330,7 +330,7 @@ describe("TryFinallyTest", () => {
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
-            await ciSleep(200)
+            await eventLogSettled(h.sql)
 
             assert.deepEqual(
                 executionOrder,
