@@ -281,50 +281,50 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | picks up SEEN | pending | |
-| 2 | picks up SUSPENDED | pending | |
-| 3 | picks up ROLLING_BACK | pending | |
-| 4 | picks up combinations | pending | |
-| 5 | picks up COMMITTED with parent ROLLBACK_EMITTED | pending | |
-| 6 | does not pick up COMMITED without parent ROLLING_BACK | pending | |
-| 7 | does not pick up rolled back | pending | |
-| 8 | does not pick up rollback failed | pending | |
-| 9 | picks up latest suspended | pending | |
-| 10 | picks up latest suspended after rollback | pending | |
-| 11 | works when no suspended is present | pending | |
-| 12 | picks up child emissions in last step | pending | |
-| 13 | does nothing when no emissions | pending | |
-| 14 | picks up child seens and their terminations | pending | |
-| 15 | picks up rollback emissions in last step | pending | |
-| 16 | does nothing when no emissions | pending | |
-| 17 | picks up child rolling backs and their terminations | pending | |
-| 18 | picks up SEEN | pending | |
-| 19 | picks up SUSPENDED | pending | |
-| 20 | picks up ROLLING_BACK | pending | |
-| 21 | picks up combinations | pending | |
-| 22 | picks up when children committed | pending | |
-| 23 | picks up when children rolled back | pending | |
-| 24 | picks up COMMITTED with parent ROLLBACK_EMITTED and unfinished child ROLLING_BACK | pending | |
-| 25 | doesn't pick up when there are unfinished children emissions | pending | |
-| 26 | doesn't pick up when there are unfinished children emissions - 2 deep | pending | |
-| 27 | picks up SEEN | pending | |
-| 28 | picks up SUSPENDED | pending | |
-| 29 | picks up ROLLING_BACK | pending | |
-| 30 | picks up combinations | pending | |
-| 31 | picks up when all children finished | pending | |
-| 32 | picks up COMMITTED with parent ROLLBACK_EMITTED and unfinished child ROLLING_BACK | pending | |
-| 33 | doesn't pick up when no child SEENs are present | pending | |
-| 34 | doesn't pick up when a child SEEN is missing, even if the rest are finished | pending | |
-| 35 | doesn't pick up when no child ROLLING_BACKs are present | pending | |
-| 36 | doesn't pick up when a child ROLLING_BACK is missing, even if the rest are finished | pending | |
-| 37 | when present, the time of rollback emission time determines precedence | pending | |
-| 38 | otherwise, first emitted first processed | pending | |
-| 39 | only single transaction can pick up a SEEN | pending | |
-| 40 | happy path | pending | |
-| 41 | picks up children rolling back | pending | |
-| 42 | picks up children rollback failures | pending | |
-| 43 | picks up rolling backs just starting | pending | |
-| 44 | picks up rolling backs later on | pending | |
+| 1 | picks up SEEN | verified | |
+| 2 | picks up SUSPENDED | verified | |
+| 3 | picks up ROLLING_BACK | verified | |
+| 4 | picks up combinations | verified | |
+| 5 | picks up COMMITTED with parent ROLLBACK_EMITTED | verified | |
+| 6 | does not pick up COMMITED without parent ROLLING_BACK | verified | |
+| 7 | does not pick up rolled back | verified | |
+| 8 | does not pick up rollback failed | verified | |
+| 9 | picks up latest suspended | verified | |
+| 10 | picks up latest suspended after rollback | verified | |
+| 11 | works when no suspended is present | verified | |
+| 12 | picks up child emissions in last step | verified | |
+| 13 | does nothing when no emissions | verified | |
+| 14 | picks up child seens and their terminations | verified | |
+| 15 | picks up rollback emissions in last step | verified | |
+| 16 | does nothing when no emissions | verified | |
+| 17 | picks up child rolling backs and their terminations | verified | |
+| 18 | picks up SEEN | verified | |
+| 19 | picks up SUSPENDED | verified | |
+| 20 | picks up ROLLING_BACK | verified | |
+| 21 | picks up combinations | verified | |
+| 22 | picks up when children committed | verified | |
+| 23 | picks up when children rolled back | verified | |
+| 24 | picks up COMMITTED with parent ROLLBACK_EMITTED and unfinished child ROLLING_BACK | verified | |
+| 25 | doesn't pick up when there are unfinished children emissions | verified | |
+| 26 | doesn't pick up when there are unfinished children emissions - 2 deep | verified | |
+| 27 | picks up SEEN | verified | |
+| 28 | picks up SUSPENDED | verified | |
+| 29 | picks up ROLLING_BACK | verified | |
+| 30 | picks up combinations | verified | |
+| 31 | picks up when all children finished | verified | |
+| 32 | picks up COMMITTED with parent ROLLBACK_EMITTED and unfinished child ROLLING_BACK | verified | |
+| 33 | doesn't pick up when no child SEENs are present | verified | |
+| 34 | doesn't pick up when a child SEEN is missing, even if the rest are finished | verified | |
+| 35 | doesn't pick up when no child ROLLING_BACKs are present | verified | |
+| 36 | doesn't pick up when a child ROLLING_BACK is missing, even if the rest are finished | verified | |
+| 37 | when present, the time of rollback emission time determines precedence | verified | |
+| 38 | otherwise, first emitted first processed | verified | |
+| 39 | only single transaction can pick up a SEEN | verified | |
+| 40 | happy path | verified | |
+| 41 | picks up children rolling back | verified | |
+| 42 | picks up children rollback failures | verified | |
+| 43 | picks up rolling backs just starting | verified | |
+| 44 | picks up rolling backs later on | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/ReturnValueTest.kt (4 tests) → test/coroutine/structuredcooperation/ReturnValueTest.test.ts
 
