@@ -102,74 +102,74 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | tab character | pending | |
-| 2 | newline character | pending | |
-| 3 | carriage return | pending | |
-| 4 | carriage return plus newline | pending | |
-| 5 | escaped double quotes | pending | |
-| 6 | backslashes | pending | |
-| 7 | forward slash | pending | |
-| 8 | backspace character | pending | |
-| 9 | form feed character | pending | |
-| 10 | null byte | pending | |
-| 11 | all JSON escape sequences combined | pending | |
-| 12 | multiple special chars in sequence | pending | |
-| 13 | special chars preserve typed value | pending | |
-| 14 | basic multilingual plane - CJK characters | pending | |
-| 15 | emoji | pending | |
-| 16 | arabic text | pending | |
-| 17 | mixed ascii and unicode | pending | |
-| 18 | unicode control characters | pending | |
-| 19 | zero-width characters | pending | |
-| 20 | empty string | pending | |
-| 21 | string with only spaces | pending | |
-| 22 | very long string | pending | |
-| 23 | long string with special chars throughout | pending | |
-| 24 | string that looks like JSON | pending | |
-| 25 | string that looks like a number | pending | |
-| 26 | string that looks like boolean | pending | |
-| 27 | string that looks like null | pending | |
-| 28 | positive integers | pending | |
-| 29 | zero | pending | |
-| 30 | negative numbers | pending | |
-| 31 | large numbers | pending | |
-| 32 | min value numbers | pending | |
-| 33 | true value | pending | |
-| 34 | false value | pending | |
-| 35 | null field value | pending | |
-| 36 | non-null field value | pending | |
-| 37 | mixed null and non-null fields | pending | |
-| 38 | empty list | pending | |
-| 39 | single item list | pending | |
-| 40 | multi item list | pending | |
-| 41 | list with special characters in items | pending | |
-| 42 | list with empty strings | pending | |
-| 43 | nested list via map | pending | |
-| 44 | simple nested object | pending | |
-| 45 | nested object with special chars | pending | |
-| 46 | deeply nested objects | pending | |
-| 47 | deeply nested with special chars | pending | |
-| 48 | empty map | pending | |
-| 49 | map with various value types | pending | |
-| 50 | map with nested map | pending | |
-| 51 | simple object | pending | |
-| 52 | object with special chars in values | pending | |
-| 53 | nested object | pending | |
-| 54 | array value | pending | |
-| 55 | complex mixed structure | pending | |
-| 56 | string with all escape sequences | pending | |
-| 57 | two elements combined via plus | pending | |
-| 58 | three elements combined | pending | |
-| 59 | complex element plus simple element | pending | |
-| 60 | string with special chars survives double round-trip | pending | |
-| 61 | complex nested structure survives double round-trip | pending | |
-| 62 | multiple elements survive double round-trip | pending | |
+| 1 | tab character | verified | |
+| 2 | newline character | verified | |
+| 3 | carriage return | verified | |
+| 4 | carriage return plus newline | verified | |
+| 5 | escaped double quotes | verified | |
+| 6 | backslashes | verified | |
+| 7 | forward slash | verified | |
+| 8 | backspace character | verified | |
+| 9 | form feed character | verified | |
+| 10 | null byte | verified | |
+| 11 | all JSON escape sequences combined | verified | |
+| 12 | multiple special chars in sequence | verified | |
+| 13 | special chars preserve typed value | verified | |
+| 14 | basic multilingual plane - CJK characters | verified | |
+| 15 | emoji | verified | |
+| 16 | arabic text | verified | |
+| 17 | mixed ascii and unicode | verified | |
+| 18 | unicode control characters | verified | |
+| 19 | zero-width characters | verified | |
+| 20 | empty string | verified | |
+| 21 | string with only spaces | verified | |
+| 22 | very long string | verified | |
+| 23 | long string with special chars throughout | verified | |
+| 24 | string that looks like JSON | verified | |
+| 25 | string that looks like a number | verified | |
+| 26 | string that looks like boolean | verified | |
+| 27 | string that looks like null | verified | |
+| 28 | positive integers | verified | |
+| 29 | zero | verified | |
+| 30 | negative numbers | verified | |
+| 31 | large numbers | verified | |
+| 32 | min value numbers | verified | |
+| 33 | true value | verified | |
+| 34 | false value | verified | |
+| 35 | null field value | verified | |
+| 36 | non-null field value | verified | |
+| 37 | mixed null and non-null fields | verified | |
+| 38 | empty list | verified | |
+| 39 | single item list | verified | |
+| 40 | multi item list | verified | |
+| 41 | list with special characters in items | verified | |
+| 42 | list with empty strings | verified | |
+| 43 | nested list via map | verified | |
+| 44 | simple nested object | verified | |
+| 45 | nested object with special chars | verified | |
+| 46 | deeply nested objects | verified | |
+| 47 | deeply nested with special chars | verified | |
+| 48 | empty map | verified | |
+| 49 | map with various value types | verified | |
+| 50 | map with nested map | verified | |
+| 51 | simple object | verified | |
+| 52 | object with special chars in values | verified | |
+| 53 | nested object | verified | |
+| 54 | array value | verified | |
+| 55 | complex mixed structure | verified | |
+| 56 | string with all escape sequences | verified | |
+| 57 | two elements combined via plus | verified | |
+| 58 | three elements combined | verified | |
+| 59 | complex element plus simple element | verified | |
+| 60 | string with special chars survives double round-trip | verified | |
+| 61 | complex nested structure survives double round-trip | verified | |
+| 62 | multiple elements survive double round-trip | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/context/CooperationContextPolymorphicCollectionTest.kt (1 tests) → test/coroutine/context/CooperationContextPolymorphicCollectionTest.test.ts
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | polymorphic list inside MappedElement round-trips through CooperationContext | pending | |
+| 1 | polymorphic list inside MappedElement round-trips through CooperationContext | verified | |
 
 ### io/github/gabrielshanahan/scoop/quarkus/PgSubscriberTopicNotifierTest.kt (1 tests) → test/quarkus/PgSubscriberTopicNotifierTest.test.ts
 
