@@ -104,8 +104,12 @@ export class OpaqueElement extends Element {
 /**
  * Base class for typed context elements defined by this service.
  *
- * Serialization: all own enumerable properties except `key` (the analog of Jackson bean
- * serialization with `@JsonIgnore` on the key).
+ * The element's "bean" form is all own enumerable properties except `key` (the analog of Jackson
+ * bean serialization with `@JsonIgnore` on the key). When an element appears NESTED inside
+ * another element's data (e.g. a deadline inside a deadline's `trace`), it serializes in
+ * context-wrapped form `{"KeyName": {…bean…}}` — exactly what the original's Jackson serializer
+ * modifier produces for any CooperationContext instance it encounters. The context codec unwraps
+ * the top level (see CooperationContextModule.ts).
  */
 export abstract class MappedElement extends Element {
     constructor(override readonly key: MappedKey<any>) {
@@ -113,9 +117,14 @@ export abstract class MappedElement extends Element {
     }
 
     toJSON(): unknown {
-        const { key: _key, ...rest } = this as Record<string, unknown>
-        return rest
+        return { [keySerializedValue(this.key)]: elementBean(this) }
     }
+}
+
+/** The element's data properties (everything except the key). */
+export function elementBean(element: Element): Record<string, unknown> {
+    const { key: _key, ...rest } = element as unknown as Record<string, unknown>
+    return rest
 }
 
 export function has(context: CooperationContext, key: Key<Element>): boolean {

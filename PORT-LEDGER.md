@@ -363,25 +363,25 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | happy path deadlines work | pending | |
+| 1 | happy path deadlines work | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/builder/SleepTest.kt (3 tests) → test/coroutine/builder/SleepTest.test.ts
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | sleep works | pending | |
-| 2 | scheduling works | pending | |
-| 3 | periodic scheduling works | pending | |
+| 1 | sleep works | verified | |
+| 2 | scheduling works | verified | |
+| 3 | periodic scheduling works | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/builder/TryFinallyTest.kt (5 tests) → test/coroutine/builder/TryFinallyTest.test.ts
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | finally is executed on success | pending | |
-| 2 | finally is executed on root failure but messages are not emitted, because neither were those in the 'try' step | pending | |
-| 3 | finally is executed on child failure | pending | |
-| 4 | finally is executed, once, on subsequent step failure | pending | |
-| 5 | finally is only executed once when its child causes a rollback | pending | |
+| 1 | finally is executed on success | verified | |
+| 2 | finally is executed on root failure but messages are not emitted, because neither were those in the 'try' step | verified | |
+| 3 | finally is executed on child failure | verified | |
+| 4 | finally is executed, once, on subsequent step failure | verified | |
+| 5 | finally is only executed once when its child causes a rollback | verified | |
 
 ### io/github/gabrielshanahan/scoop/messaging/MultiHandlerTopicNotifyTest.kt (1 tests) → test/messaging/MultiHandlerTopicNotifyTest.test.ts
 

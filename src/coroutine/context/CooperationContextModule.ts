@@ -1,6 +1,7 @@
 import {
     CooperationContext,
     Element,
+    elementBean,
     keySerializedValue,
     OpaqueElement,
 } from "./CooperationContext.js"
@@ -34,7 +35,11 @@ function serializeInto(value: CooperationContext, parts: string[]): void {
     if (value instanceof OpaqueElement) {
         parts.push(`${JSON.stringify(value.key.key)}:${value.json}`)
     } else if (value instanceof Element) {
-        parts.push(`${JSON.stringify(keySerializedValue(value.key))}:${JSON.stringify(value)}`)
+        // Top level is unwrapped ({key: bean}); nested elements inside the bean serialize
+        // context-wrapped via their toJSON.
+        parts.push(
+            `${JSON.stringify(keySerializedValue(value.key))}:${JSON.stringify(elementBean(value))}`,
+        )
     } else {
         value.fold(undefined, (_, element) => {
             serializeInto(element, parts)

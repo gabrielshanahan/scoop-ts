@@ -14,12 +14,23 @@ export interface DeadlineData {
     readonly trace: DeadlineData[]
 }
 
-function withoutTrace(deadline: DeadlineData): DeadlineData {
-    return { deadline: deadline.deadline, source: deadline.source, trace: [] }
+type Create<T extends DeadlineData> = (
+    deadline: string,
+    source: string,
+    trace: DeadlineData[],
+) => T
+
+/**
+ * Trace entries are REAL deadline instances (constructed via [create]) so they serialize in the
+ * context-wrapped form, exactly like the Kotlin `withoutTrace()` which instantiates the concrete
+ * deadline class.
+ */
+function withoutTrace<T extends DeadlineData>(deadline: DeadlineData, create: Create<T>): T {
+    return create(deadline.deadline, deadline.source, [])
 }
 
-function asTrace(deadline: DeadlineData): DeadlineData[] {
-    return dedupe([withoutTrace(deadline), ...deadline.trace])
+function asTrace<T extends DeadlineData>(deadline: DeadlineData, create: Create<T>): DeadlineData[] {
+    return dedupe([withoutTrace(deadline, create), ...deadline.trace])
 }
 
 function structurallyEqual(a: DeadlineData, b: DeadlineData): boolean {
@@ -48,10 +59,14 @@ function dedupe(items: DeadlineData[]): DeadlineData[] {
 export function combineDeadlines<T extends DeadlineData>(
     self: T,
     other: T,
-    create: (deadline: string, source: string, trace: DeadlineData[]) => T,
+    create: Create<T>,
 ): T {
     const selfEarlier = compareTimestamps(self.deadline, other.deadline) <= 0
     const earlier = selfEarlier ? self : other
     const later = selfEarlier ? other : self
-    return create(earlier.deadline, earlier.source, dedupe([...earlier.trace, ...asTrace(later)]))
+    return create(
+        earlier.deadline,
+        earlier.source,
+        dedupe([...earlier.trace, ...asTrace(later, create)]),
+    )
 }
