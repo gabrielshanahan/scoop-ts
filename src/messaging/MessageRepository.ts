@@ -30,7 +30,7 @@ export class MessageRepository {
             return {
                 id: row.id as string,
                 topic: row.topic as string,
-                payload: row.payload,
+                payload: this.jsonbHelper.fromJsonb(row.payload),
                 createdAt: row.created_at as Date,
             }
         })

@@ -19,6 +19,12 @@
  * Monotonic time is measured in nanoseconds via `process.hrtime.bigint()` (converted to Number —
  * safe for relative comparisons over any realistic process lifetime).
  */
+
+/**
+ * Consecutive zero-insert reconcile passes required before a woken worker stops reconciling.
+ */
+const QUIET_TICKS = 3
+
 export class ReconcileGate {
     // Set by NOTIFY, consumed in shouldReconcile. Starts armed so the first tick after
     // subscribe/startup reconciles, catching messages emitted while this worker was down.
@@ -98,11 +104,6 @@ export class ReconcileGate {
         return new ReconcileGate(intervalNanos, nowNanos + jitterNanos)
     }
 }
-
-/**
- * Consecutive zero-insert reconcile passes required before a woken worker stops reconciling.
- */
-const QUIET_TICKS = 3
 
 function monotonicNanos(): number {
     return Number(process.hrtime.bigint())

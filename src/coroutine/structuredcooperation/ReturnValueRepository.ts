@@ -80,7 +80,10 @@ export class ReturnValueRepository {
             )
             const result = new Map<Handler<unknown>, JsonValue>()
             for (const row of rows) {
-                result.set(handlerRegistry(row.handler_name as string), row.value)
+                result.set(
+                    handlerRegistry(row.handler_name as string),
+                    this.jsonbHelper.fromJsonb(row.value),
+                )
             }
             return result
         })
@@ -108,7 +111,8 @@ export class ReturnValueRepository {
                     childCardinality: parentLineage.length + 1,
                 },
             )
-            return rows[0]?.value ?? null
+            const value = rows[0]?.value
+            return value === undefined ? null : this.jsonbHelper.fromJsonb(value)
         })
     }
 }

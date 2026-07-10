@@ -492,7 +492,7 @@ export class MessageEventRepository {
         return {
             messageId: row.id as string,
             topic: row.topic as string,
-            payload: row.payload,
+            payload: this.jsonbHelper.fromJsonb(row.payload),
             createdAt: row.created_at as Date,
             cooperationLineage: row.cooperation_lineage as string[],
             step: (row.step as string | null) ?? null,
