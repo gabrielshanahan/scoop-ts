@@ -76,6 +76,10 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   collide on the parent SEEN row's FOR UPDATE SKIP LOCKED every tick until the loser's gate goes
   quiet — observed once as a 10s stall (the 30s safety net is the designed backstop, but the
   original's gate sizing assumes scheduler jitter). The jitter restores that assumption.
+  The notifier also marks each stored LISTEN promise's rejection as handled: tearing the pool
+  down while a LISTEN is still in flight (short-lived process, test ending) must log the failure
+  and surface it through `ready()`, not escalate to an unhandledRejection (soak-caught: a fast
+  test ended before its LISTEN round-trip completed and the pool teardown failed the run).
 - **Fixed sleeps that gate a mutation became condition polls**: three original tests wait
   `latch + Thread.sleep(100)` and then issue a cancel/rollback request that is only honoured
   "after everything has finished running". Under load the 100ms settle races the final commits

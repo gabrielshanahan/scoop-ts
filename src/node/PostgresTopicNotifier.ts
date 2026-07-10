@@ -34,18 +34,22 @@ export class PostgresTopicNotifier implements TopicNotifier {
             const set = new Set<() => void>()
             this.callbacksByTopic.set(topic, set)
             callbacks = set
-            this.listens.push(
-                this.sql
-                    .listen(topic, () => {
-                        for (const cb of set) {
-                            setTimeout(cb, Math.random() * 10)
-                        }
-                    })
-                    .catch(e => {
-                        log.error({ err: e, topic }, "Failed to LISTEN on topic")
-                        throw e
-                    }),
-            )
+            const listen = this.sql
+                .listen(topic, () => {
+                    for (const cb of set) {
+                        setTimeout(cb, Math.random() * 10)
+                    }
+                })
+                .catch(e => {
+                    log.error({ err: e, topic }, "Failed to LISTEN on topic")
+                    throw e
+                })
+            // A LISTEN can still be in flight when the pool is torn down (e.g. a short-lived
+            // process, or a test ending); the failure is already logged above, and `ready()`
+            // still observes it — but nothing else may ever await this promise, so mark the
+            // rejection handled or it escalates to an unhandledRejection at teardown.
+            listen.catch(() => {})
+            this.listens.push(listen)
         }
         callbacks.add(callback)
 
