@@ -90,13 +90,13 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | ALWAYS always reconciles regardless of state | pending | |
-| 2 | starts armed so the first tick reconciles, then drains to idle | pending | |
-| 3 | markDirty re-arms the drain | pending | |
-| 4 | a productive pass keeps the drain going (handles contending siblings) | pending | |
-| 5 | safety net forces a reconcile when idle | pending | |
-| 6 | reconcileFailed re-arms so the next tick retries | pending | |
-| 7 | a notification landing during a reconcile survives the consume-before-work clear | pending | |
+| 1 | ALWAYS always reconciles regardless of state | verified | |
+| 2 | starts armed so the first tick reconciles, then drains to idle | verified | |
+| 3 | markDirty re-arms the drain | verified | |
+| 4 | a productive pass keeps the drain going (handles contending siblings) | verified | |
+| 5 | safety net forces a reconcile when idle | verified | |
+| 6 | reconcileFailed re-arms so the next tick retries | verified | |
+| 7 | a notification landing during a reconcile survives the consume-before-work clear | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/context/CooperationContextModuleTest.kt (62 tests) → test/coroutine/context/CooperationContextModuleTest.test.ts
 
@@ -231,10 +231,10 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | handler should not complete until handlers listening to emitted messages complete - depth 1 | pending | |
-| 2 | handler should not complete until handlers listening to emitted messages complete - depth 2 | pending | |
-| 3 | multiple handlers at same level should all complete before parent handler completes | pending | |
-| 4 | parent should wait for multiple handlers listening to the same topic | pending | |
+| 1 | handler should not complete until handlers listening to emitted messages complete - depth 1 | verified | |
+| 2 | handler should not complete until handlers listening to emitted messages complete - depth 2 | verified | |
+| 3 | multiple handlers at same level should all complete before parent handler completes | verified | |
+| 4 | parent should wait for multiple handlers listening to the same topic | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/InfrastructureFailureRetryTest.kt (2 tests) → test/coroutine/structuredcooperation/InfrastructureFailureRetryTest.test.ts
 
