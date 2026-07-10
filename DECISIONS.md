@@ -69,6 +69,13 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
 - **Test isolation**: one Postgres container per suite run (or an external `DATABASE_URL`),
   migrations applied once, `TRUNCATE message_event, message, return_value` before each test (the
   original's `@BeforeEach` does the same), test files run sequentially.
+- **NOTIFY fan-out dispatch jitter** (`PostgresTopicNotifier`): each callback is dispatched with
+  a 0–10ms random delay. The original dispatches onto per-callback virtual threads whose
+  scheduling naturally desynchronizes sibling workers; a same-microtask dispatch on Node's single
+  event loop leaves same-topic workers phase-locked, and their armed reconcile passes can then
+  collide on the parent SEEN row's FOR UPDATE SKIP LOCKED every tick until the loser's gate goes
+  quiet — observed once as a 10s stall (the 30s safety net is the designed backstop, but the
+  original's gate sizing assumes scheduler jitter). The jitter restores that assumption.
 - **Fixed sleeps that gate a mutation became condition polls**: three original tests wait
   `latch + Thread.sleep(100)` and then issue a cancel/rollback request that is only honoured
   "after everything has finished running". Under load the 100ms settle races the final commits
