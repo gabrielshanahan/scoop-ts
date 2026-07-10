@@ -268,14 +268,14 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | should write EMITTED event when message is published | pending | |
-| 2 | should write one SEEN event per handler | pending | |
-| 3 | should synchronize multiple instances of the same handler using message event records | pending | |
-| 4 | should write COMMITTED event on successful transaction | pending | |
-| 5 | should write ROLLED_BACK event when exception is thrown | pending | |
-| 6 | should follow complete message event writing sequence on successful processing | pending | |
-| 7 | should follow complete message event writing sequence on failed processing | pending | |
-| 8 | multiple handler instances should coordinate using message events for multiple messages | pending | |
+| 1 | should write EMITTED event when message is published | verified | |
+| 2 | should write one SEEN event per handler | verified | |
+| 3 | should synchronize multiple instances of the same handler using message event records | verified | |
+| 4 | should write COMMITTED event on successful transaction | verified | |
+| 5 | should write ROLLED_BACK event when exception is thrown | verified | |
+| 6 | should follow complete message event writing sequence on successful processing | verified | |
+| 7 | should follow complete message event writing sequence on failed processing | verified | |
+| 8 | multiple handler instances should coordinate using message events for multiple messages | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/PendingCoroutineRunSqlTest.kt (44 tests) → test/coroutine/structuredcooperation/PendingCoroutineRunSqlTest.test.ts
 
@@ -330,10 +330,10 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | child handler can store a return value that parent retrieves | pending | |
-| 2 | multiple child handlers can each store return values | pending | |
-| 3 | getReturnValue retrieves a specific child's return value by handler | pending | |
-| 4 | different variable names are independent | pending | |
+| 1 | child handler can store a return value that parent retrieves | verified | |
+| 2 | multiple child handlers can each store return values | verified | |
+| 3 | getReturnValue retrieves a specific child's return value by handler | verified | |
+| 4 | different variable names are independent | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/RollbackPathTest.kt (10 tests) → test/coroutine/structuredcooperation/RollbackPathTest.test.ts
 
