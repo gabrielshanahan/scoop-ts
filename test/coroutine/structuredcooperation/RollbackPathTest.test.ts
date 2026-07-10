@@ -9,7 +9,7 @@ import {
 import type { CooperationScopeIdentifier } from "../../../src/coroutine/CooperationScopeIdentifier.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, setupScoopTest, waitUntil } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import {
     asSource,
@@ -1601,7 +1601,15 @@ describe("RollbackPathTest", () => {
                 )
 
                 assert.ok(await latch.await(10_000), "Not everything completed correctly")
-                await ciSleep(100)
+                // The rollback request is only honoured once nothing in the hierarchy is still
+                // running; the original's fixed 100ms settle races slow commits, so wait for the
+                // exact precondition (both sagas COMMITTED) instead (DECISIONS.md).
+                await waitUntil(async () => {
+                    const [row] = await h.sql`
+                        SELECT count(*)::int AS committed FROM message_event WHERE type = 'COMMITTED'
+                    `
+                    return Number(row!.committed) >= 2
+                }, 10_000, "both sagas to commit")
 
                 await transactional(h.sql, async connection => {
                     await h.scoop.capabilities.rollback(
@@ -1682,7 +1690,15 @@ describe("RollbackPathTest", () => {
                 })
 
                 assert.ok(await latch.await(10_000), "Not everything completed correctly")
-                await ciSleep(100)
+                // The rollback request is only honoured once nothing in the hierarchy is still
+                // running; the original's fixed 100ms settle races slow commits, so wait for the
+                // exact precondition (both sagas COMMITTED) instead (DECISIONS.md).
+                await waitUntil(async () => {
+                    const [row] = await h.sql`
+                        SELECT count(*)::int AS committed FROM message_event WHERE type = 'COMMITTED'
+                    `
+                    return Number(row!.committed) >= 2
+                }, 10_000, "both sagas to commit")
 
                 await transactional(h.sql, async connection => {
                     await h.scoop.capabilities.rollback(

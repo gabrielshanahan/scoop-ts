@@ -3,7 +3,7 @@ import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, setupScoopTest } from "../../support/harness.js"
+import { ciSleep, setupScoopTest, waitUntil } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import {
     asSource,
@@ -211,7 +211,15 @@ describe("CancellationTest", () => {
             )
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
-            await ciSleep(100)
+            // The fixed 100ms settle in the original races slow commits: the cancel must happen
+            // "after everything has finished running", so wait for that exact condition (both
+            // sagas COMMITTED) — the deterministic form of the same precondition (DECISIONS.md).
+            await waitUntil(async () => {
+                const [row] = await h.sql`
+                    SELECT count(*)::int AS committed FROM message_event WHERE type = 'COMMITTED'
+                `
+                return Number(row!.committed) >= 2
+            }, 10_000, "both sagas to commit")
 
             await transactional(h.sql, async connection => {
                 await h.scoop.capabilities.cancel(

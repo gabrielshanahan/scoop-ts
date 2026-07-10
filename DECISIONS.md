@@ -66,9 +66,16 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   (`SystemClock` in production, controllable in tests) — this is a divergence from the original,
   which calls `OffsetDateTime.now()` / `CLOCK_TIMESTAMP()`; DB-side `CLOCK_TIMESTAMP()` defaults are
   retained (they are part of the schema contract).
-- **Test isolation**: one Postgres container per suite run, migrations applied once, `TRUNCATE
-  message_event, message, return_value` before each test (the original's `@BeforeEach` does the
-  same), test files run sequentially.
+- **Test isolation**: one Postgres container per suite run (or an external `DATABASE_URL`),
+  migrations applied once, `TRUNCATE message_event, message, return_value` before each test (the
+  original's `@BeforeEach` does the same), test files run sequentially.
+- **Fixed sleeps that gate a mutation became condition polls**: three original tests wait
+  `latch + Thread.sleep(100)` and then issue a cancel/rollback request that is only honoured
+  "after everything has finished running". Under load the 100ms settle races the final commits
+  (observed once under Docker disk pressure; the race exists in the Kotlin original too). The
+  ports wait for the exact precondition instead — both sagas COMMITTED — via bounded polling
+  (`waitUntil`); every assertion is unchanged. Sleeps that merely settle before reading state are
+  kept as in the original.
 
 ## The scoop-quarkus main-file mapping (concrete)
 
