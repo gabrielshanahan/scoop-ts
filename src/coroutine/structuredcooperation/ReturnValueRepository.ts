@@ -35,7 +35,7 @@ export class ReturnValueRepository {
                         lineage: uuidArrayLiteral(cooperationLineage),
                         handlerName,
                         variableName: variableName.serializedValue,
-                        value: this.jsonbHelper.toJsonText(value),
+                        value: this.jsonbHelper.toJsonbParam(value),
                     },
                 )
             } catch (e) {

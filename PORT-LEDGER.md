@@ -339,16 +339,16 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | a handler failing in its first step should never emit what is in the step and not call rollback() (since the transaction wasn't committed) | pending | |
-| 2 | a handler failing in its second step should emit ROLLBACK_EMITTEDs for messages emitted in the first step, and then roll it back | pending | |
-| 3 | when a child fails, rollbacks happen in reverse order | pending | |
-| 4 | when a later step fails, previous emissions are rolled back | pending | |
-| 5 | rollbacks are well behaved n-deep | pending | |
-| 6 | failed rollbacks are well behaved n-deep | pending | |
-| 7 | when stuff is emitted in handleChildFailures and then a rollback happens, all things that haven't already been rolled back are rolled back | pending | |
-| 8 | rolling back the entire hierarchy works | pending | |
-| 9 | rolling back sub-hierarchy works (but should be done carefully, as you run the risk of bringing the state of the system into an inconsistent state from a business perspective) | pending | |
-| 10 | rolling back while things are still running has no effect | pending | |
+| 1 | a handler failing in its first step should never emit what is in the step and not call rollback() (since the transaction wasn't committed) | verified | |
+| 2 | a handler failing in its second step should emit ROLLBACK_EMITTEDs for messages emitted in the first step, and then roll it back | verified | |
+| 3 | when a child fails, rollbacks happen in reverse order | verified | |
+| 4 | when a later step fails, previous emissions are rolled back | verified | |
+| 5 | rollbacks are well behaved n-deep | verified | |
+| 6 | failed rollbacks are well behaved n-deep | verified | |
+| 7 | when stuff is emitted in handleChildFailures and then a rollback happens, all things that haven't already been rolled back are rolled back | verified | |
+| 8 | rolling back the entire hierarchy works | verified | |
+| 9 | rolling back sub-hierarchy works (but should be done carefully, as you run the risk of bringing the state of the system into an inconsistent state from a business perspective) | verified | |
+| 10 | rolling back while things are still running has no effect | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/SqlTestUtils.kt — helper/base class (0 tests) → status: ported (test/support/SqlTestUtils.ts)
 

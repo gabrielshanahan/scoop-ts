@@ -18,7 +18,7 @@ export class SqlTestUtils {
     async createMessage(topic: string, payload: JsonValue): Promise<Message> {
         const [row] = await this.sql`
             INSERT INTO message (topic, payload)
-            VALUES (${topic}, ${this.jsonbHelper.toJsonText(payload)}::jsonb)
+            VALUES (${topic}, ${this.jsonbHelper.toJsonbParam(payload) as never}::jsonb)
             RETURNING id, created_at
         `
         return {
@@ -66,12 +66,12 @@ export class SqlTestUtils {
         throwable: Error | null,
     ): Promise<string> {
         const exception = throwable
-            ? this.jsonbHelper.toJsonText(
+            ? (this.jsonbHelper.toJsonbParam(
                   cooperationFailureFromThrowable(
                       throwable,
                       `${distributedCoroutineIdentifier.name}[${distributedCoroutineIdentifier.instance}]`,
                   ),
-              )
+              ) as never)
             : null
         const [row] = await this.sql`
             INSERT INTO message_event (message_id, type, coroutine_name, coroutine_identifier, cooperation_lineage, exception)
@@ -110,12 +110,12 @@ export class SqlTestUtils {
     ): Promise<string> {
         const identifier = continuationIdentifier.distributedCoroutineIdentifier
         const exception = throwable
-            ? this.jsonbHelper.toJsonText(
+            ? (this.jsonbHelper.toJsonbParam(
                   cooperationFailureFromThrowable(
                       throwable,
                       `${identifier.name}[${identifier.instance}]`,
                   ),
-              )
+              ) as never)
             : null
         const [row] = await this.sql`
             INSERT INTO message_event (message_id, type, coroutine_name, coroutine_identifier, step, cooperation_lineage, exception)

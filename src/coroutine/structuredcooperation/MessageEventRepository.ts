@@ -21,11 +21,11 @@ const log = logger("MessageEventRepository")
 export class MessageEventRepository {
     constructor(private readonly jsonbHelper: JsonbHelper) {}
 
-    private contextParam(context: CooperationContext | null | undefined): string | null {
+    private contextParam(context: CooperationContext | null | undefined): unknown {
         if (!context || !isNotEmpty(context)) {
             return null
         }
-        return this.jsonbHelper.toJsonText(context)
+        return this.jsonbHelper.toJsonbParam(context)
     }
 
     /** Records that a message was emitted on the global scope (a new cooperation root). */
@@ -137,7 +137,7 @@ export class MessageEventRepository {
                 ON CONFLICT (message_id, type) WHERE type = 'ROLLBACK_EMITTED' DO NOTHING`,
                 {
                     cooperationLineage: uuidArrayLiteral(cooperationLineage),
-                    exception: this.jsonbHelper.toJsonText(exception),
+                    exception: this.jsonbHelper.toJsonbParam(exception),
                 },
             )
         })
@@ -176,7 +176,7 @@ export class MessageEventRepository {
                 ON CONFLICT (cooperation_lineage, type) WHERE type = 'CANCELLATION_REQUESTED' DO NOTHING`,
                 {
                     cooperationLineage: uuidArrayLiteral(cooperationLineage),
-                    exception: this.jsonbHelper.toJsonText(exception),
+                    exception: this.jsonbHelper.toJsonbParam(exception),
                 },
             )
         })
@@ -207,7 +207,7 @@ export class MessageEventRepository {
                     coroutineIdentifier,
                     stepName,
                     cooperationLineage: uuidArrayLiteral(cooperationLineage),
-                    exception: exception ? this.jsonbHelper.toJsonText(exception) : null,
+                    exception: exception ? this.jsonbHelper.toJsonbParam(exception) : null,
                     context: this.contextParam(context),
                     childFailureHandlerIteration,
                     nextStep,
@@ -261,7 +261,7 @@ export class MessageEventRepository {
                     coroutineName,
                     coroutineIdentifier,
                     scopeStepName,
-                    exception: this.jsonbHelper.toJsonText(exception),
+                    exception: this.jsonbHelper.toJsonbParam(exception),
                     context: this.contextParam(context),
                     suspendedAt,
                 },

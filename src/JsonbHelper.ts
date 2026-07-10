@@ -36,6 +36,19 @@ export class JsonbHelper {
     }
 
     /**
+     * Prepares a value for use as a jsonb query parameter. postgres.js resolves `$n::jsonb`
+     * parameter types server-side and JSON-serializes the JS value — so parameters must be the
+     * parsed JSON VALUE, never pre-serialized JSON text (which would double-encode into a jsonb
+     * string). [CooperationContext] values go through the context codec and back to a value.
+     */
+    toJsonbParam(value: unknown): unknown {
+        if (isCooperationContext(value)) {
+            return JSON.parse(writeContextJson(value))
+        }
+        return value
+    }
+
+    /**
      * Deserializes a JSONB column value (already parsed by postgres.js, or raw JSON text) into a
      * plain JS value.
      */

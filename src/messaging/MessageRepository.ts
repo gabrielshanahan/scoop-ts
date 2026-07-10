@@ -46,7 +46,7 @@ export class MessageRepository {
             const rows = await queryNamed(
                 connection,
                 "INSERT INTO message (topic, payload) VALUES (:topic, :payload::jsonb) RETURNING id, created_at",
-                { topic, payload: this.jsonbHelper.toJsonText(payload) },
+                { topic, payload: this.jsonbHelper.toJsonbParam(payload) },
             )
             const row = rows[0]!
             const message: Message = {
