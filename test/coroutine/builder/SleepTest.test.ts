@@ -31,7 +31,7 @@ describe("SleepTest", () => {
                 },
             })
         })
-        const rootSubscription = h.subscribe(h.rootTopic, rootHandlerCoroutine)
+        const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         try {
             await transactional(h.sql, async connection => {
@@ -70,7 +70,7 @@ describe("SleepTest", () => {
                 latch.countDown()
             })
         })
-        const rootSubscription = h.subscribe(h.rootTopic, rootHandlerCoroutine)
+        const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         try {
             await transactional(h.sql, async connection => {
@@ -114,7 +114,7 @@ describe("SleepTest", () => {
                 },
             })
         })
-        const rootSubscription = h.subscribe(h.rootTopic, rootHandlerCoroutine)
+        const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         try {
             await transactional(h.sql, async connection => {

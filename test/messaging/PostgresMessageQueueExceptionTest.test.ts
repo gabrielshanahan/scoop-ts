@@ -22,7 +22,7 @@ describe("PostgresMessageQueueExceptionTest", () => {
         const customExceptionMessage = "Custom exception for testing exception storage"
 
         const rootHandler = "exception-test-handler"
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({

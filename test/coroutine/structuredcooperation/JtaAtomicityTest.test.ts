@@ -49,7 +49,7 @@ describe("JtaAtomicityTest", () => {
         const probeId = `commit-${randomUUID()}`
         const latch = new CountDownLatch(1)
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             h.rootTopic,
             saga("jta-commit-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -64,7 +64,7 @@ describe("JtaAtomicityTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("jta-commit-child", eventLoopStrategy(h.messageQueue), b => {
                 b.step({ invoke: () => {} })
@@ -102,7 +102,7 @@ describe("JtaAtomicityTest", () => {
         const probeId = `rollback-${randomUUID()}`
         const latch = new CountDownLatch(1)
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             h.rootTopic,
             saga("jta-rollback-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({

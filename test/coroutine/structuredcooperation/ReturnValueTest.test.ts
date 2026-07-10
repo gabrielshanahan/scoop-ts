@@ -54,7 +54,7 @@ describe("ReturnValueTest", () => {
         let retrievedValues: Map<Handler<unknown>, JsonValue> | null = null
         const latch = new CountDownLatch(2)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -75,7 +75,7 @@ describe("ReturnValueTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("ChildHandler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -113,7 +113,7 @@ describe("ReturnValueTest", () => {
 
         const childTopic2 = "child-topic-2"
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -135,7 +135,7 @@ describe("ReturnValueTest", () => {
             }),
         )
 
-        const childSubscription1 = h.subscribe(
+        const childSubscription1 = await h.subscribe(
             h.childTopic,
             saga("ChildHandler1", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -146,7 +146,7 @@ describe("ReturnValueTest", () => {
             }),
         )
 
-        const childSubscription2 = h.subscribe(
+        const childSubscription2 = await h.subscribe(
             childTopic2,
             saga("ChildHandler2", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -185,7 +185,7 @@ describe("ReturnValueTest", () => {
         let missingValue: JsonValue | null = {} // sentinel to detect null
         const latch = new CountDownLatch(2)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -204,7 +204,7 @@ describe("ReturnValueTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("ChildHandler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -237,7 +237,7 @@ describe("ReturnValueTest", () => {
         let anotherResults: Map<Handler<unknown>, JsonValue> | null = null
         const latch = new CountDownLatch(2)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -259,7 +259,7 @@ describe("ReturnValueTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("ChildHandler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({

@@ -86,6 +86,11 @@ export class Scoop {
     }
 
     /** Stops Scoop's internal subscriptions. Pool lifecycle stays with the caller. */
+    /** Resolves once the internal notification channels are active — see [Subscription.ready]. */
+    ready(): Promise<void> {
+        return this.messageQueue.ready()
+    }
+
     close(): Promise<void> {
         return this.messageQueue.close()
     }

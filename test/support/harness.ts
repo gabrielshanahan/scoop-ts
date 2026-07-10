@@ -97,11 +97,22 @@ export class ScoopHarness {
 
     private readonly openSubscriptions = new Set<Subscription>()
 
-    /** Subscribe with automatic cleanup at file teardown (tests still close explicitly). */
-    subscribe(topic: string, saga: DistributedCoroutine, instances = 1): Subscription {
+    /**
+     * Subscribe with automatic cleanup at file teardown (tests still close explicitly). Awaits
+     * [Subscription.ready] so tests can publish immediately after subscribing without racing the
+     * LISTEN registration (the polling safety net would still deliver, but only on its schedule
+     * — far past the tests' latch timeouts; see DECISIONS.md).
+     */
+    async subscribe(
+        topic: string,
+        saga: DistributedCoroutine,
+        instances = 1,
+    ): Promise<Subscription> {
         const subscription = this.messageQueue.subscribe(topic, saga, instances)
         this.openSubscriptions.add(subscription)
+        await subscription.ready()
         return {
+            ready: () => subscription.ready(),
             close: async () => {
                 this.openSubscriptions.delete(subscription)
                 await subscription.close()
@@ -150,8 +161,16 @@ export function setupScoopTest(options: { tickIntervalMillis?: number } = {}): S
         harness.scoop = Scoop.create(harness.sql, {
             topicNotifier: harness.topicNotifier,
             tickIntervalMillis: options.tickIntervalMillis,
+            // Tests allow sagas ~10s to finish. Any missed wake signal (NOTIFY raced by an
+            // in-flight LISTEN registration or a listen-connection hiccup) is repaired by the
+            // reconcile safety net, whose production default (30s) is deliberately lazy. The
+            // system's contract is that notification delivery affects only latency, never
+            // correctness — so tests run the sweep at 2s to keep worst-case recovery well
+            // inside their latch windows (see DECISIONS.md).
+            reconcileSafetyNetMillis: 2_000,
         })
         harness.messageQueue = harness.scoop.messageQueue
+        await harness.scoop.ready()
     })
 
     beforeEach(async () => {

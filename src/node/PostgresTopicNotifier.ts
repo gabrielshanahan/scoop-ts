@@ -24,11 +24,11 @@ const log = logger("PostgresTopicNotifier")
  */
 export class PostgresTopicNotifier implements TopicNotifier {
     private readonly callbacksByTopic = new Map<string, Set<() => void>>()
-    private readonly listens: Promise<ListenMeta>[] = []
+    private readonly listenByTopic = new Map<string, Promise<ListenMeta>>()
 
     constructor(private readonly sql: Sql) {}
 
-    onMessage(topic: string, callback: () => void): { close(): void } {
+    onMessage(topic: string, callback: () => void): { close(): void; ready: Promise<void> } {
         let callbacks = this.callbacksByTopic.get(topic)
         if (!callbacks) {
             const set = new Set<() => void>()
@@ -45,15 +45,19 @@ export class PostgresTopicNotifier implements TopicNotifier {
                     throw e
                 })
             // A LISTEN can still be in flight when the pool is torn down (e.g. a short-lived
-            // process, or a test ending); the failure is already logged above, and `ready()`
-            // still observes it — but nothing else may ever await this promise, so mark the
+            // process, or a test ending); the failure is already logged above, and awaiting
+            // `ready` still observes it — but nothing is obliged to ever await it, so mark the
             // rejection handled or it escalates to an unhandledRejection at teardown.
             listen.catch(() => {})
-            this.listens.push(listen)
+            this.listenByTopic.set(topic, listen)
         }
         callbacks.add(callback)
 
+        const ready = this.listenByTopic.get(topic)!.then(() => undefined)
+        ready.catch(() => {})
+
         return {
+            ready,
             close: () => {
                 callbacks.delete(callback)
             },
@@ -62,6 +66,6 @@ export class PostgresTopicNotifier implements TopicNotifier {
 
     /** Waits until every requested LISTEN is active (useful in tests to avoid startup races). */
     async ready(): Promise<void> {
-        await Promise.all(this.listens)
+        await Promise.all(this.listenByTopic.values())
     }
 }

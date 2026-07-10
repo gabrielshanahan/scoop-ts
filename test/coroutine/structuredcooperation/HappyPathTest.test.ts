@@ -15,7 +15,7 @@ describe("HappyPathTest", () => {
 
         const latch = new CountDownLatch(4) // 2 root steps + 2 child steps
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -34,7 +34,7 @@ describe("HappyPathTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -96,7 +96,7 @@ describe("HappyPathTest", () => {
 
         const latch = new CountDownLatch(7) // 2 root steps + 3 child steps + 2 grandchild steps
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -115,7 +115,7 @@ describe("HappyPathTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -140,7 +140,7 @@ describe("HappyPathTest", () => {
             }),
         )
 
-        const grandchildSubscription = h.subscribe(
+        const grandchildSubscription = await h.subscribe(
             h.grandchildTopic,
             saga("grandchild-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -215,7 +215,7 @@ describe("HappyPathTest", () => {
 
         const childTopic2 = "child-topic-2"
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -235,7 +235,7 @@ describe("HappyPathTest", () => {
             }),
         )
 
-        const childSubscription1 = h.subscribe(
+        const childSubscription1 = await h.subscribe(
             h.childTopic,
             saga("child-handler-1", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -254,7 +254,7 @@ describe("HappyPathTest", () => {
             }),
         )
 
-        const childSubscription2 = h.subscribe(
+        const childSubscription2 = await h.subscribe(
             childTopic2,
             saga("child-handler-2", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -359,7 +359,7 @@ describe("HappyPathTest", () => {
 
         const latch = new CountDownLatch(6) // 2 root + 2 x 2 children listening to same topic
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -378,7 +378,7 @@ describe("HappyPathTest", () => {
             }),
         )
 
-        const childSubscription1 = h.subscribe(
+        const childSubscription1 = await h.subscribe(
             h.childTopic,
             saga("child-handler-1", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -397,7 +397,7 @@ describe("HappyPathTest", () => {
             }),
         )
 
-        const childSubscription2 = h.subscribe(
+        const childSubscription2 = await h.subscribe(
             h.childTopic,
             saga("child-handler-2", eventLoopStrategy(h.messageQueue), b => {
                 b.step({

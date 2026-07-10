@@ -80,6 +80,22 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   down while a LISTEN is still in flight (short-lived process, test ending) must log the failure
   and surface it through `ready()`, not escalate to an unhandledRejection (soak-caught: a fast
   test ended before its LISTEN round-trip completed and the pool teardown failed the run).
+- **Subscriptions expose `ready()`; test harness awaits it and runs a 2s reconcile safety net**:
+  `subscribe()` wires two delivery paths — the periodic tick (correct immediately) and
+  LISTEN/NOTIFY (a latency optimization whose registration round-trip is asynchronous). A message
+  published after subscribe but before the LISTEN is active can fire its NOTIFY into the void;
+  the worker's startup-armed reconcile window (QUIET_TICKS drains) sometimes closes first, and
+  recovery then waits for the reconcile safety net — production default 30s, far past the tests'
+  10s latches. Debug-instrumented reproduction (file-soak iteration 96): the second handler on a
+  topic never wrote SEEN while every worker ticked "No messages for coroutine"; the parent
+  legitimately waits forever for a handler that never saw the message. Two-part remedy, both
+  faithful to the design's contract that notification delivery affects latency, never
+  correctness: (1) `Subscription.ready()` / `TopicNotifier.onMessage(...).ready` resolve when the
+  LISTEN is acknowledged — the harness `subscribe` awaits it (the Kotlin/Vert.x original has the
+  same registration window; its README acknowledges the resulting flakiness); (2) the harness
+  runs `reconcileSafetyNetMillis: 2_000` so any residual missed wake (e.g. a listen-connection
+  reconnect dropping a notification) is repaired well inside the latch windows. Production
+  defaults are unchanged.
 - **Fixed sleeps that gate a mutation became condition polls**: three original tests wait
   `latch + Thread.sleep(100)` and then issue a cancel/rollback request that is only honoured
   "after everything has finished running". Under load the 100ms settle races the final commits

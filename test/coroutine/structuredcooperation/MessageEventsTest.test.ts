@@ -56,14 +56,14 @@ describe("MessageEventsTest", () => {
         const handlerName2 = "test-handler-2"
         const latch = new CountDownLatch(2)
 
-        const subscription1 = h.subscribe(
+        const subscription1 = await h.subscribe(
             testTopic,
             saga(handlerName1, eventLoopStrategy(h.messageQueue), b => {
                 b.step({ invoke: () => latch.countDown() })
             }),
         )
 
-        const subscription2 = h.subscribe(
+        const subscription2 = await h.subscribe(
             testTopic,
             saga(handlerName2, eventLoopStrategy(h.messageQueue), b => {
                 b.step({ invoke: () => latch.countDown() })
@@ -94,7 +94,7 @@ describe("MessageEventsTest", () => {
         let processedCount = 0
         const latch = new CountDownLatch(1)
 
-        const subscription1 = h.subscribe(
+        const subscription1 = await h.subscribe(
             testTopic,
             saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -106,7 +106,7 @@ describe("MessageEventsTest", () => {
             }),
         )
 
-        const subscription2 = h.subscribe(
+        const subscription2 = await h.subscribe(
             testTopic,
             saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -140,7 +140,7 @@ describe("MessageEventsTest", () => {
         const handlerName = "commit-test-handler"
         const latch = new CountDownLatch(1)
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             testTopic,
             saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
                 b.step({ invoke: () => latch.countDown() })
@@ -167,7 +167,7 @@ describe("MessageEventsTest", () => {
         const handlerName = "rollback-test-handler"
         const latch = new CountDownLatch(1)
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             testTopic,
             saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -203,7 +203,7 @@ describe("MessageEventsTest", () => {
         const handlerName = "sequence-test-handler"
         const latch = new CountDownLatch(1)
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             testTopic,
             saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
                 b.step({ invoke: () => latch.countDown() })
@@ -255,7 +255,7 @@ describe("MessageEventsTest", () => {
         const handlerName = "failed-sequence-handler"
         const latch = new CountDownLatch(1)
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             testTopic,
             saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -319,7 +319,7 @@ describe("MessageEventsTest", () => {
         const processedMessages = new Set<string>()
         const countDownLatch = new CountDownLatch(messageCount)
 
-        const subscription1 = h.subscribe(
+        const subscription1 = await h.subscribe(
             testTopic,
             saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -331,7 +331,7 @@ describe("MessageEventsTest", () => {
             }),
         )
 
-        const subscription2 = h.subscribe(
+        const subscription2 = await h.subscribe(
             testTopic,
             saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
                 b.step({

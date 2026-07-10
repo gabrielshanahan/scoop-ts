@@ -48,9 +48,12 @@ while ((sectionMatch = sectionRegex.exec(ledger)) !== null) {
         targets.push({ tsFile, testName: row[1]!, pure })
     }
 }
-// Optional subset filter (substring match on the TS file path), e.g. SOAK_ONLY=HappyPath
+// Optional subset filter (substring match on the TS file path or the test name),
+// e.g. SOAK_ONLY=HappyPath or SOAK_ONLY="rollbacks are well behaved n-deep"
 const only = process.env.SOAK_ONLY
-const selectedTargets = only ? targets.filter(target => target.tsFile.includes(only)) : targets
+const selectedTargets = only
+    ? targets.filter(target => target.tsFile.includes(only) || target.testName.includes(only))
+    : targets
 console.log(`soaking ${selectedTargets.length} tests${only ? ` (filter: ${only})` : ""}`)
 
 // --- Shared database ------------------------------------------------------------------------------

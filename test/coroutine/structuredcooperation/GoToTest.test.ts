@@ -28,7 +28,7 @@ describe("GoToTest", () => {
 
         const latch = new CountDownLatch(2) // step-0 + step-2
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({
@@ -89,7 +89,7 @@ describe("GoToTest", () => {
         // A→B→C→GoTo(0)→A→B→C = 6 step executions
         const latch = new CountDownLatch(6)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({
@@ -157,7 +157,7 @@ describe("GoToTest", () => {
 
         const latch = new CountDownLatch(4) // 3 self-goto iterations + 1 next step
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({
@@ -211,7 +211,7 @@ describe("GoToTest", () => {
 
         const latch = new CountDownLatch(1) // wait for last rollback
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({
@@ -314,7 +314,7 @@ describe("GoToTest", () => {
 
         const latch = new CountDownLatch(1) // wait for root rollback
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({
@@ -342,7 +342,7 @@ describe("GoToTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -421,7 +421,7 @@ describe("GoToTest", () => {
 
         const latch = new CountDownLatch(1) // wait for rollback
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({
@@ -465,7 +465,7 @@ describe("GoToTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -536,7 +536,7 @@ describe("GoToTest", () => {
 
         const latch = new CountDownLatch(1) // wait for rollback
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({
@@ -581,7 +581,7 @@ describe("GoToTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -640,7 +640,7 @@ describe("GoToTest", () => {
 
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({
@@ -721,7 +721,7 @@ describe("GoToTest", () => {
 
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({
@@ -811,7 +811,7 @@ describe("GoToTest", () => {
 
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.controlledStep({

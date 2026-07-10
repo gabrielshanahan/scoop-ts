@@ -38,7 +38,7 @@ describe("ContextPropagationTest", () => {
 
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -75,7 +75,7 @@ describe("ContextPropagationTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({

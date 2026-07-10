@@ -59,7 +59,7 @@ describe("StubHandlerBlockingTest", () => {
         let loopCounter = 0
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", strategyWithStubHandler(), b => {
                 b.controlledStep({
@@ -79,7 +79,7 @@ describe("StubHandlerBlockingTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -124,7 +124,7 @@ describe("StubHandlerBlockingTest", () => {
         const firstIterLatch = new CountDownLatch(1)
         const secondIterLatch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", strategyWithStubHandler(), b => {
                 b.controlledStep({

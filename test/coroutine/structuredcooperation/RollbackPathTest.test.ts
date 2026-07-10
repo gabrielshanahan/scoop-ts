@@ -39,7 +39,7 @@ describe("RollbackPathTest", () => {
         const executionOrder: string[] = []
 
         const rootHandler = "root-handler"
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -85,7 +85,7 @@ describe("RollbackPathTest", () => {
         const executionOrder: string[] = []
 
         const rootHandler = "root-handler"
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -157,7 +157,7 @@ describe("RollbackPathTest", () => {
         const executionOrder: string[] = []
 
         const rootHandler = "root-handler"
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -179,7 +179,7 @@ describe("RollbackPathTest", () => {
         )
 
         const childHandler = "child-handler"
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga(childHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -259,7 +259,7 @@ describe("RollbackPathTest", () => {
         const executionOrder: string[] = []
 
         const rootHandler = "root-handler"
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -296,7 +296,7 @@ describe("RollbackPathTest", () => {
         )
 
         const childHandler = "child-handler"
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga(childHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -411,7 +411,7 @@ describe("RollbackPathTest", () => {
                 },
             })
         })
-        const rootSubscription = h.subscribe(h.rootTopic, rootHandlerCoroutine)
+        const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         const childHandler1Coroutine = saga(
             "child-handler-1",
@@ -450,7 +450,7 @@ describe("RollbackPathTest", () => {
                 })
             },
         )
-        const childSubscription1 = h.subscribe(h.childTopic, childHandler1Coroutine)
+        const childSubscription1 = await h.subscribe(h.childTopic, childHandler1Coroutine)
 
         const childHandler2Coroutine = saga(
             "child-handler-2",
@@ -475,7 +475,7 @@ describe("RollbackPathTest", () => {
                 })
             },
         )
-        const childSubscription2 = h.subscribe(h.childTopic, childHandler2Coroutine)
+        const childSubscription2 = await h.subscribe(h.childTopic, childHandler2Coroutine)
 
         const grandChildCoroutine = saga(
             "grandchild-handler",
@@ -504,7 +504,7 @@ describe("RollbackPathTest", () => {
                 })
             },
         )
-        const grandchildSubscription = h.subscribe(h.grandchildTopic, grandChildCoroutine)
+        const grandchildSubscription = await h.subscribe(h.grandchildTopic, grandChildCoroutine)
 
         try {
             await transactional(h.sql, async connection => {
@@ -853,7 +853,7 @@ describe("RollbackPathTest", () => {
             })
         })
 
-        const rootSubscription = h.subscribe(h.rootTopic, rootHandlerCoroutine)
+        const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         const childHandler1Coroutine = saga(
             "child-handler-1",
@@ -889,7 +889,7 @@ describe("RollbackPathTest", () => {
                 })
             },
         )
-        const childSubscription1 = h.subscribe(h.childTopic, childHandler1Coroutine)
+        const childSubscription1 = await h.subscribe(h.childTopic, childHandler1Coroutine)
 
         const childHandler2Coroutine = saga(
             "child-handler-2",
@@ -914,7 +914,7 @@ describe("RollbackPathTest", () => {
                 })
             },
         )
-        const childSubscription2 = h.subscribe(h.childTopic, childHandler2Coroutine)
+        const childSubscription2 = await h.subscribe(h.childTopic, childHandler2Coroutine)
 
         const grandChildCoroutine = saga(
             "grandchild-handler",
@@ -944,7 +944,7 @@ describe("RollbackPathTest", () => {
                 })
             },
         )
-        const grandchildSubscription = h.subscribe(h.grandchildTopic, grandChildCoroutine)
+        const grandchildSubscription = await h.subscribe(h.grandchildTopic, grandChildCoroutine)
 
         try {
             await transactional(h.sql, async connection => {
@@ -1379,7 +1379,7 @@ describe("RollbackPathTest", () => {
             const executionOrder: string[] = []
 
             const rootHandler = "root-handler"
-            const rootSubscription = h.subscribe(
+            const rootSubscription = await h.subscribe(
                 h.rootTopic,
                 saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
                     b.step({
@@ -1411,7 +1411,7 @@ describe("RollbackPathTest", () => {
             )
 
             const childHandler1 = "child-handler-1"
-            const childSubscription1 = h.subscribe(
+            const childSubscription1 = await h.subscribe(
                 h.childTopic,
                 saga(childHandler1, eventLoopStrategy(h.messageQueue), b => {
                     b.step({
@@ -1434,7 +1434,7 @@ describe("RollbackPathTest", () => {
             )
 
             const childHandler2 = "child-handler-2"
-            const childSubscription2 = h.subscribe(
+            const childSubscription2 = await h.subscribe(
                 h.childTopic,
                 saga(childHandler2, eventLoopStrategy(h.messageQueue), b => {
                     b.step({
@@ -1574,7 +1574,7 @@ describe("RollbackPathTest", () => {
             const latch = new CountDownLatch(1)
             const rollbackLatch = new CountDownLatch(1)
 
-            const rootSubscription = h.subscribe(
+            const rootSubscription = await h.subscribe(
                 h.rootTopic,
                 saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                     b.step({
@@ -1588,7 +1588,7 @@ describe("RollbackPathTest", () => {
                 }),
             )
 
-            const childSubscription = h.subscribe(
+            const childSubscription = await h.subscribe(
                 h.childTopic,
                 saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                     b.step({ invoke: () => latch.countDown() })
@@ -1656,7 +1656,7 @@ describe("RollbackPathTest", () => {
             const latch = new CountDownLatch(1)
             const rollbackLatch = new CountDownLatch(1)
 
-            const rootSubscription = h.subscribe(
+            const rootSubscription = await h.subscribe(
                 h.rootTopic,
                 saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                     b.step({
@@ -1669,7 +1669,7 @@ describe("RollbackPathTest", () => {
 
             let cooperationScopeIdentifier!: CooperationScopeIdentifier
 
-            const childSubscription = h.subscribe(
+            const childSubscription = await h.subscribe(
                 h.childTopic,
                 saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                     b.step({
@@ -1741,7 +1741,7 @@ describe("RollbackPathTest", () => {
             const secondRootStepExecuting = new CountDownLatch(1)
             const rollbackEmitted = new CountDownLatch(1)
 
-            const rootSubscription = h.subscribe(
+            const rootSubscription = await h.subscribe(
                 h.rootTopic,
                 saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                     b.step({
@@ -1761,7 +1761,7 @@ describe("RollbackPathTest", () => {
 
             let cooperationScopeIdentifier!: CooperationScopeIdentifier
 
-            const childSubscription = h.subscribe(
+            const childSubscription = await h.subscribe(
                 h.childTopic,
                 saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                     b.step({

@@ -30,7 +30,7 @@ describe("InfrastructureFailureRetryTest", () => {
         const committed = new CountDownLatch(1)
 
         const rootHandler = "root-handler"
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -85,7 +85,7 @@ describe("InfrastructureFailureRetryTest", () => {
         let attempts = 0
 
         const rootHandler = "root-handler"
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({

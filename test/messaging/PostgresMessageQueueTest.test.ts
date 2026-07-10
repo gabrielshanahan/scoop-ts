@@ -37,7 +37,7 @@ describe("PostgresMessageQueueTest", () => {
         let receivedCount = 0
         const latch = new CountDownLatch(messageCount)
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             testTopic,
             saga(testHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -72,7 +72,7 @@ describe("PostgresMessageQueueTest", () => {
         const otherTopic = "otherTopic"
         const otherPayload = { otherIndex: 1 }
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             testTopic,
             saga(testHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -129,7 +129,7 @@ describe("PostgresMessageQueueTest", () => {
         const seenInstances = new Set<string>()
         const seenNames = new Set<string>()
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             testTopic,
             saga(testHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -199,7 +199,7 @@ describe("PostgresMessageQueueTest", () => {
     test("requiredConnectionCount reflects registered worker instances", async () => {
         const baseline = h.messageQueue.requiredConnectionCount
 
-        const subscription = h.subscribe(
+        const subscription = await h.subscribe(
             testTopic,
             saga(testHandler, eventLoopStrategy(h.messageQueue), b => {
                 b.step({ invoke: () => {} })

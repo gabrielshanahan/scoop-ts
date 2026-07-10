@@ -16,7 +16,7 @@ describe("TryFinallyTest", () => {
         const finallyTopic = "finally-topic"
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 tryFinallyStep(
@@ -39,7 +39,7 @@ describe("TryFinallyTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -50,7 +50,7 @@ describe("TryFinallyTest", () => {
             }),
         )
 
-        const finallySubscription = h.subscribe(
+        const finallySubscription = await h.subscribe(
             finallyTopic,
             saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -87,7 +87,7 @@ describe("TryFinallyTest", () => {
         const finallyTopic = "finally-topic"
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 tryFinallyStep(
@@ -105,7 +105,7 @@ describe("TryFinallyTest", () => {
             }),
         )
 
-        const finallySubscription = h.subscribe(
+        const finallySubscription = await h.subscribe(
             finallyTopic,
             saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -141,7 +141,7 @@ describe("TryFinallyTest", () => {
         const finallyTopic = "finally-topic"
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 tryFinallyStep(
@@ -163,7 +163,7 @@ describe("TryFinallyTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -175,7 +175,7 @@ describe("TryFinallyTest", () => {
             }),
         )
 
-        const finallySubscription = h.subscribe(
+        const finallySubscription = await h.subscribe(
             finallyTopic,
             saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -213,7 +213,7 @@ describe("TryFinallyTest", () => {
         const finallyTopic = "finally-topic"
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -244,7 +244,7 @@ describe("TryFinallyTest", () => {
             }),
         )
 
-        const finallySubscription = h.subscribe(
+        const finallySubscription = await h.subscribe(
             finallyTopic,
             saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -287,7 +287,7 @@ describe("TryFinallyTest", () => {
         const finallyTopic = "finally-topic"
         const latch = new CountDownLatch(1)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -312,7 +312,7 @@ describe("TryFinallyTest", () => {
             }),
         )
 
-        const finallySubscription = h.subscribe(
+        const finallySubscription = await h.subscribe(
             finallyTopic,
             saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({

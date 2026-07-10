@@ -36,7 +36,7 @@ describe("CancellationTest", () => {
                 },
             })
         })
-        const rootSubscription = h.subscribe(h.rootTopic, rootHandlerCoroutine)
+        const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         const childHandlerCoroutine = saga(
             "child-handler",
@@ -53,7 +53,7 @@ describe("CancellationTest", () => {
                 })
             },
         )
-        const childSubscription = h.subscribe(h.childTopic, childHandlerCoroutine)
+        const childSubscription = await h.subscribe(h.childTopic, childHandlerCoroutine)
 
         try {
             const cooperationRoot = await transactional(h.sql, connection =>
@@ -179,7 +179,7 @@ describe("CancellationTest", () => {
 
         const latch = new CountDownLatch(2)
 
-        const rootSubscription = h.subscribe(
+        const rootSubscription = await h.subscribe(
             h.rootTopic,
             saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({
@@ -192,7 +192,7 @@ describe("CancellationTest", () => {
             }),
         )
 
-        const childSubscription = h.subscribe(
+        const childSubscription = await h.subscribe(
             h.childTopic,
             saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
                 b.step({

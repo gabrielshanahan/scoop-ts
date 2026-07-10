@@ -37,7 +37,7 @@ describe("DeadlineTest", () => {
                 },
             })
         })
-        const rootSubscription = h.subscribe(h.rootTopic, rootHandlerCoroutine)
+        const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         const childHandlerCoroutine = saga(
             "child-handler",
@@ -51,7 +51,7 @@ describe("DeadlineTest", () => {
                 })
             },
         )
-        const childSubscription = h.subscribe(h.childTopic, childHandlerCoroutine)
+        const childSubscription = await h.subscribe(h.childTopic, childHandlerCoroutine)
 
         try {
             await transactional(h.sql, async connection => {
