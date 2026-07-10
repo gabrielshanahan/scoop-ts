@@ -202,15 +202,15 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | cancellation works | pending | |
-| 2 | cancellation after everything has finished running has no effect | pending | |
+| 1 | cancellation works | verified | |
+| 2 | cancellation after everything has finished running has no effect | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/CooperationFailureTest.kt (2 tests) → test/coroutine/structuredcooperation/CooperationFailureTest.test.ts
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | test deserialization of unknown failure type | pending | |
-| 2 | test idempotence of mapping Throwable - CooperationFailure - JSON - CooperationFailure - Throwable | pending | |
+| 1 | test deserialization of unknown failure type | verified | exact-JSON pin (JVM/Quarkus frames) → structural pin of serialized form; frame values are environment paths on this runtime |
+| 2 | test idempotence of mapping Throwable - CooperationFailure - JSON - CooperationFailure - Throwable | verified | exact-JSON pin (JVM/Quarkus frames) → structural pin of serialized form; frame values are environment paths on this runtime |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/GoToTest.kt (10 tests) → test/coroutine/structuredcooperation/GoToTest.test.ts
 

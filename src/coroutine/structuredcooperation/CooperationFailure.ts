@@ -62,7 +62,12 @@ export function cooperationFailureFromThrowable(
     throwable: Error,
     source: string,
 ): CooperationFailure {
-    const stackTrace = stackTraceFrames(throwable)
+    // A CooperationException carries the original distributed frames (the Kotlin original
+    // replaces the JVM stack trace with them); reuse those rather than re-parsing the JS stack.
+    const stackTrace =
+        throwable instanceof CooperationException
+            ? throwable.stackTraceFrames
+            : stackTraceFrames(throwable)
 
     const causes: CooperationFailure[] = []
     const aggregated = throwable as MaybeAggregated
