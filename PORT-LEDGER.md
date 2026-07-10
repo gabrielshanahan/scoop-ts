@@ -216,16 +216,16 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | GoTo forward skips intermediate steps | pending | |
-| 2 | GoTo backward re-executes from target step | pending | |
-| 3 | GoTo self behaves like Repeat | pending | |
-| 4 | GoTo plus rollback rolls back in reverse chronological order | pending | |
-| 5 | loop with children rolls back each iteration's children in reverse | pending | |
-| 6 | handleChildFailures can override NextStep and childFailureHandlerIteration increments correctly | pending | |
-| 7 | handleChildFailures receives correct nextStep for GoTo | pending | |
-| 8 | GoTo forward skip does not include skipped step in rollback | pending | |
-| 9 | GoTo forward then GoTo backward with failure rolls back all visited instances | pending | |
-| 10 | GoTo to repeating step then failure rolls back all instances | pending | |
+| 1 | GoTo forward skips intermediate steps | verified | |
+| 2 | GoTo backward re-executes from target step | verified | |
+| 3 | GoTo self behaves like Repeat | verified | |
+| 4 | GoTo plus rollback rolls back in reverse chronological order | verified | |
+| 5 | loop with children rolls back each iteration's children in reverse | verified | |
+| 6 | handleChildFailures can override NextStep and childFailureHandlerIteration increments correctly | verified | |
+| 7 | handleChildFailures receives correct nextStep for GoTo | verified | |
+| 8 | GoTo forward skip does not include skipped step in rollback | verified | |
+| 9 | GoTo forward then GoTo backward with failure rolls back all visited instances | verified | |
+| 10 | GoTo to repeating step then failure rolls back all instances | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/HappyPathTest.kt (4 tests) → test/coroutine/structuredcooperation/HappyPathTest.test.ts
 
