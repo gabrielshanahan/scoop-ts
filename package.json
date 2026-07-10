@@ -1,0 +1,30 @@
+{
+  "name": "scoop",
+  "version": "0.4.0",
+  "description": "Scoop — a proof-of-concept implementation of structured cooperation for distributed, message-based systems. TypeScript port of the Kotlin/JVM original.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "node --import tsx --test --test-concurrency=1 'src/**/*.test.ts'",
+    "migrate": "tsx scripts/migrate.ts"
+  },
+  "dependencies": {
+    "pino": "^9.0.0",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@sinclair/typebox": "^0.34.0",
+    "@testcontainers/postgresql": "^10.0.0",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
+}
