@@ -240,15 +240,15 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | a ScoopInfrastructureException is retried (not rolled back) and the run eventually commits | pending | |
-| 2 | a plain business exception still rolls back and is not retried | pending | |
+| 1 | a ScoopInfrastructureException is retried (not rolled back) and the run eventually commits | verified | |
+| 2 | a plain business exception still rolls back and is not retried | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/JtaAtomicityTest.kt (2 tests) → test/coroutine/structuredcooperation/JtaAtomicityTest.test.ts
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | business write inside a step commits atomically with scoop events | pending | |
-| 2 | business write rolls back together with the step when the step throws | pending | |
+| 1 | business write inside a step commits atomically with scoop events | verified | JTA @Transactional-enlisted business write → business write on scope.connection inside the sql.begin() step transaction; same atomicity assertions |
+| 2 | business write rolls back together with the step when the step throws | verified | JTA @Transactional-enlisted business write → business write on scope.connection inside the sql.begin() step transaction; same atomicity assertions |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/LoopTest.kt (9 tests) → test/coroutine/structuredcooperation/LoopTest.test.ts
 
