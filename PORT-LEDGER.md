@@ -185,18 +185,18 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | context is propagated correctly | pending | |
+| 1 | context is propagated correctly | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/context/CooperationContextTest.kt (6 tests) → test/coroutine/context/CooperationContextTest.test.ts
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | test emtpy | pending | |
-| 2 | test null values are preserved in round-trip | pending | |
-| 3 | test null values mixed with other values are preserved in round-trip | pending | |
-| 4 | test nested null values are preserved in round-trip | pending | |
-| 5 | test null values in arrays are preserved in round-trip | pending | |
-| 6 | test everything works as expected | pending | |
+| 1 | test emtpy | verified | |
+| 2 | test null values are preserved in round-trip | verified | |
+| 3 | test null values mixed with other values are preserved in round-trip | verified | |
+| 4 | test nested null values are preserved in round-trip | verified | |
+| 5 | test null values in arrays are preserved in round-trip | verified | |
+| 6 | test everything works as expected | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/CancellationTest.kt (2 tests) → test/coroutine/structuredcooperation/CancellationTest.test.ts
 
@@ -356,8 +356,8 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | repeating step blocks when stub handler has not started | pending | |
-| 2 | repeating step resumes after externally writing SEEN and COMMITTED for stub handler | pending | |
+| 1 | repeating step blocks when stub handler has not started | verified | |
+| 2 | repeating step resumes after externally writing SEEN and COMMITTED for stub handler | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/eventloop/deadline/DeadlineTest.kt (1 tests) → test/coroutine/eventloop/deadline/DeadlineTest.test.ts
 
