@@ -175,11 +175,11 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | callback should not run on vert-x event loop thread | pending | |
+| 1 | callback should not run on vert-x event loop thread | verified | Vert.x off-event-loop-thread dispatch → postgres.js LISTEN/NOTIFY delivery + async (microtask) dispatch; no threads on this runtime |
 
-### io/github/gabrielshanahan/scoop/coroutine/StructuredCooperationTest.kt — helper/base class (0 tests) → status: pending
+### io/github/gabrielshanahan/scoop/coroutine/StructuredCooperationTest.kt — helper/base class (0 tests) → status: ported (test/support/harness.ts)
 
-### io/github/gabrielshanahan/scoop/coroutine/util.kt — helper/base class (0 tests) → status: pending
+### io/github/gabrielshanahan/scoop/coroutine/util.kt — helper/base class (0 tests) → status: ported (test/support/util.ts + latch.ts)
 
 ### io/github/gabrielshanahan/scoop/coroutine/context/ContextPropagationTest.kt (1 tests) → test/coroutine/context/ContextPropagationTest.test.ts
 
@@ -350,7 +350,7 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 | 9 | rolling back sub-hierarchy works (but should be done carefully, as you run the risk of bringing the state of the system into an inconsistent state from a business perspective) | pending | |
 | 10 | rolling back while things are still running has no effect | pending | |
 
-### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/SqlTestUtils.kt — helper/base class (0 tests) → status: pending
+### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/SqlTestUtils.kt — helper/base class (0 tests) → status: ported (test/support/SqlTestUtils.ts)
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/StubHandlerBlockingTest.kt (2 tests) → test/coroutine/structuredcooperation/StubHandlerBlockingTest.test.ts
 
@@ -387,32 +387,32 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | both sagas on one topic are notified promptly by a single message | pending | |
+| 1 | both sagas on one topic are notified promptly by a single message | verified | |
 
 ### io/github/gabrielshanahan/scoop/messaging/PostgresMessageQueueExceptionTest.kt (1 tests) → test/messaging/PostgresMessageQueueExceptionTest.test.ts
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | test exception is stored and can be retrieved | pending | |
+| 1 | test exception is stored and can be retrieved | verified | JVM FQCN exception type → Error.name ('CustomTestException') |
 
 ### io/github/gabrielshanahan/scoop/messaging/PostgresMessageQueueTest.kt (6 tests) → test/messaging/PostgresMessageQueueTest.test.ts
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | should publish a message | pending | |
-| 2 | should subscribe to messages | pending | |
-| 3 | subscribe should isolate transactions between messages and correctly roll back failures | pending | |
-| 4 | subscribe with multiple instances fans work out across distinct instance UUIDs | pending | |
-| 5 | subscribe rejects instances less than one | pending | |
-| 6 | requiredConnectionCount reflects registered worker instances | pending | |
+| 1 | should publish a message | verified | |
+| 2 | should subscribe to messages | verified | |
+| 3 | subscribe should isolate transactions between messages and correctly roll back failures | verified | |
+| 4 | subscribe with multiple instances fans work out across distinct instance UUIDs | verified | |
+| 5 | subscribe rejects instances less than one | verified | |
+| 6 | requiredConnectionCount reflects registered worker instances | verified | |
 
-### io/github/gabrielshanahan/scoop/messaging/shutdownrepro/ReproSubscriptionRegistrar.kt — helper/base class (0 tests) → status: pending
+### io/github/gabrielshanahan/scoop/messaging/shutdownrepro/ReproSubscriptionRegistrar.kt — helper/base class (0 tests) → status: ported (test/messaging/shutdownrepro/ReproSubscriptionRegistrar.ts)
 
 ### io/github/gabrielshanahan/scoop/messaging/shutdownrepro/ShutdownSpamReproTest.kt (1 tests) → test/messaging/shutdownrepro/ShutdownSpamReproTest.test.ts
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | subscriptions leak past test end so quarkus shutdown races scoop ticks | pending | |
+| 1 | subscriptions leak past test end so quarkus shutdown races scoop ticks | verified | Quarkus-shutdown log grep → stdout capture across dedicated-instance teardown; asserts zero tick-error spam |
 
 ## Reconciliation
 
