@@ -58,8 +58,10 @@ const container = await new PostgreSqlContainer("postgres:15").start()
 const url = container.getConnectionUri()
 const sql = postgres(url, { max: 1 })
 await applyMigrations(sql, join(root, "db", "migration"))
+const [clockRow] = await sql`SELECT EXTRACT(EPOCH FROM CLOCK_TIMESTAMP()) * 1000 AS db_ms`
+const skew = Math.round(Number(clockRow!.db_ms) - Date.now())
 await sql.end()
-console.log("postgres ready, migrations applied")
+console.log(`postgres ready, migrations applied (db-host clock skew: ${skew}ms)`)
 
 const child = spawn(
     process.execPath,

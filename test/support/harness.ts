@@ -5,6 +5,7 @@ import { JsonbHelper } from "../../src/JsonbHelper.js"
 import type { DistributedCoroutine } from "../../src/coroutine/DistributedCoroutine.js"
 import { PostgresMessageQueue } from "../../src/messaging/PostgresMessageQueue.js"
 import type { Subscription } from "../../src/messaging/Subscription.js"
+import { calibrateClockToDatabase } from "../../src/node/calibrateClock.js"
 import { PostgresTopicNotifier } from "../../src/node/PostgresTopicNotifier.js"
 import { sleep } from "./latch.js"
 
@@ -97,6 +98,12 @@ export function setupScoopTest(options: { tickIntervalMillis?: number } = {}): S
             throw new Error("DATABASE_URL not set — run tests via `npm test` (scripts/run-tests.ts)")
         }
         harness.sql = postgres(url, { max: 30 })
+        // The engine's authoritative clock is Postgres; align the injected client clock with it
+        // (Docker VM clocks drift relative to the host — see DECISIONS.md).
+        const offset = await calibrateClockToDatabase(harness.sql)
+        if (Math.abs(offset) > 50) {
+            console.log(`[harness] db-host clock offset: ${Math.round(offset)}ms (calibrated)`)
+        }
         harness.topicNotifier = new PostgresTopicNotifier(harness.sql)
         harness.scoop = Scoop.create(harness.sql, {
             topicNotifier: harness.topicNotifier,

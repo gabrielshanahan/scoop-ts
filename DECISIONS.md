@@ -53,6 +53,15 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
 
 ## Determinism decisions
 
+- **Clock calibration against the database** (`src/node/calibrateClock.ts`): the engine's
+  authoritative clock is Postgres (`CLOCK_TIMESTAMP()`), but `HandlerRegistry.eventLoopStrategy()`
+  bakes a client-clock `ignoreOlderThan` cutoff into the readiness SQL. When the client clock runs
+  ahead of the DB clock (Docker VM drift — observed transiently at several hundred ms), a message
+  launched right after strategy creation gets `created_at < ignoreOlderThan` and is ignored
+  forever. Proven experimentally: +1s injected skew stalls every saga; calibration fixes it. The
+  Kotlin original implicitly assumes host≈DB time; the test harness calibrates the injected clock
+  at startup and the calibration helper ships in `src/node` for production use.
+
 - **Clock injection**: engine logic never reads wall-clock directly; a `Clock` interface is injected
   (`SystemClock` in production, controllable in tests) — this is a divergence from the original,
   which calls `OffsetDateTime.now()` / `CLOCK_TIMESTAMP()`; DB-side `CLOCK_TIMESTAMP()` defaults are

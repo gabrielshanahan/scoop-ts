@@ -254,15 +254,15 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 | # | Test | Status | Notes |
 |---|---|---|---|
-| 1 | step returning Repeat re-executes with incremented iteration | pending | |
-| 2 | zero-iteration loop behaves like normal step | pending | |
-| 3 | loop with child launches waits for each batch | pending | |
-| 4 | handleChildFailures receives correct childFailureHandlerIteration | pending | |
-| 5 | mid-loop failure triggers rollback for each iteration in reverse order | pending | |
-| 6 | single iteration loop with rollback behaves like normal step rollback | pending | |
-| 7 | completed loop followed by later failure rolls back all iterations | pending | |
-| 8 | multiple loop steps followed by failure roll back all iterations of both | pending | |
-| 9 | childFailureHandlerIteration is tracked correctly during rollback | pending | |
+| 1 | step returning Repeat re-executes with incremented iteration | verified | |
+| 2 | zero-iteration loop behaves like normal step | verified | |
+| 3 | loop with child launches waits for each batch | verified | |
+| 4 | handleChildFailures receives correct childFailureHandlerIteration | verified | |
+| 5 | mid-loop failure triggers rollback for each iteration in reverse order | verified | |
+| 6 | single iteration loop with rollback behaves like normal step rollback | verified | |
+| 7 | completed loop followed by later failure rolls back all iterations | verified | |
+| 8 | multiple loop steps followed by failure roll back all iterations of both | verified | |
+| 9 | childFailureHandlerIteration is tracked correctly during rollback | verified | |
 
 ### io/github/gabrielshanahan/scoop/coroutine/structuredcooperation/MessageEventsTest.kt (8 tests) → test/coroutine/structuredcooperation/MessageEventsTest.test.ts
 
