@@ -85,6 +85,7 @@ npm test -- --shuffle=12345     # reproduce a specific order
 npm test -- test/coroutine/structuredcooperation/RollbackPathTest.test.ts   # one file
 npm run typecheck               # tsc --noEmit
 npx tsx scripts/reconcile.ts    # mechanical port-completeness proof against the Kotlin repo
+npx tsx scripts/stability-campaign.ts   # 20 full-suite runs (mixed shuffle) against one shared Postgres
 ```
 
 The suite is the Kotlin suite ported test-for-test: 195 `@Test` methods across 29 files (the

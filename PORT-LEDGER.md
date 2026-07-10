@@ -416,9 +416,15 @@ Each maps to a core/node concern per DECISIONS.md ("The scoop-quarkus question")
 
 ## Reconciliation
 
-- scoop-core main files: 58
-- scoop-quarkus main files: 5
-- test files: 29 (4 helpers)
-- test methods: 195
+- scoop-core main files: **58/58 ported**
+- scoop-quarkus main files: **5/5 resolved** (see DECISIONS.md "The scoop-quarkus question")
+- test files: **29/29 ported** (4 helpers/base classes → test/support/*)
+- test methods: **195/195 verified** (ported faithfully AND passing against real Postgres)
 
-Run `npx tsx scripts/reconcile.ts` to mechanically verify this ledger against the reference repo and the ported suite.
+Mechanical proof: `npm run reconcile` re-derives the inventory from the Kotlin reference repo
+(63 main files, 195 @Test methods), checks every entry appears in this ledger with no `pending`
+status, and verifies each ported TS test file contains exactly the ledgered number of test cases.
+
+Stability: `npx tsx scripts/stability-campaign.ts` runs the full suite 20 times against one
+shared Postgres (alternating declaration order and seeded shuffles) and requires 195/0 on every
+run.
