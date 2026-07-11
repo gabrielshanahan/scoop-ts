@@ -1,0 +1,65 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: scoop
+          POSTGRES_PASSWORD: scoop
+          POSTGRES_DB: scoop
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+        timeout-minutes: 5
+
+      - name: Typecheck
+        run: npm run typecheck
+        timeout-minutes: 5
+
+      - name: Reconcile port ledger
+        # The Kotlin reference repo is absent in CI; the script skips the cross-check and
+        # still enforces every ledger-internal and TS-side invariant.
+        run: npm run reconcile
+        timeout-minutes: 5
+
+      - name: Test
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://scoop:scoop@localhost:5432/scoop
+          CI_TIMEOUT_MULTIPLIER: 3
+        timeout-minutes: 15
+
+      - name: Verify publishable artifacts
+        run: |
+          npm run build
+          npm pack --dry-run
+        timeout-minutes: 5

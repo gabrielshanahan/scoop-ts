@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump type
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  id-token: write # npm provenance
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: scoop
+          POSTGRES_PASSWORD: scoop
+          POSTGRES_DB: scoop
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        run: npm ci
+        timeout-minutes: 5
+
+      - name: Bump version
+        id: bump
+        env:
+          BUMP: ${{ github.event.inputs.bump }}
+        run: |
+          next=$(npm version "$BUMP" --no-git-tag-version)
+          echo "version=${next#v}" >> "$GITHUB_OUTPUT"
+          echo "Bumped version to ${next}"
+
+      - name: Typecheck
+        run: npm run typecheck
+        timeout-minutes: 5
+
+      - name: Reconcile port ledger
+        run: npm run reconcile
+        timeout-minutes: 5
+
+      - name: Test
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://scoop:scoop@localhost:5432/scoop
+          CI_TIMEOUT_MULTIPLIER: 3
+        timeout-minutes: 15
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        timeout-minutes: 5
+
+      - name: Stamp release notes
+        run: |
+          version="${{ steps.bump.outputs.version }}"
+          date=$(date -u +%Y-%m-%d)
+          sed -i "s/^## Unreleased$/## Unreleased\n\n## v${version} — ${date}/" RELEASE_NOTES.md
+
+      - name: Commit version bump and tag
+        run: |
+          version="${{ steps.bump.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json RELEASE_NOTES.md
+          git commit -m "Release v${version}"
+          git tag "v${version}"
+          git push origin HEAD --tags
