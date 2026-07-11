@@ -111,6 +111,19 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   `created_at = GREATEST(CLOCK_TIMESTAMP(), max(created_at) over the lineage + 1 microsecond)`,
   so same-lineage ties cannot be produced — real-time semantics are preserved except under a
   tie, where the later event is nudged 1μs forward.
+- **Timestamp parameters must be bound through `::text`** (`:suspendedAt::text::timestamptz`):
+  postgres.js resolves a parameter's wire type from its placeholder cast, and a JS string bound
+  directly at a `::timestamptz` position is serialized client-side through a JS `Date` — which
+  silently truncates microseconds to milliseconds. `insertRollbackEmittedEventsForStep` passes
+  the SUSPENDED event's timestamp back into the `created_at < :suspendedAt` window; truncated,
+  the boundary moves *before* the emission whenever the emission and its suspension share a
+  millisecond, the window comes back empty, zero ROLLBACK_EMITTED rows are written, and the
+  parent's rollback silently skips its children's rollbacks (post-mortem-captured: a grandchild
+  stayed COMMITTED while its whole ancestry rolled back "successfully"; head-to-head bind
+  comparison in scripts/scratch-window-repro.ts). Same postgres.js gotcha class as the jsonb
+  double-encoding above — the fix routes the bind through `::text` so the string reaches the
+  server verbatim and the cast happens server-side at full precision. (The Kotlin original binds
+  through JDBC with microsecond-precise types, so this failure mode is port-specific.)
 - **Fixed sleeps that gate a mutation became condition polls**: three original tests wait
   `latch + Thread.sleep(100)` and then issue a cancel/rollback request that is only honoured
   "after everything has finished running". Under load the 100ms settle races the final commits

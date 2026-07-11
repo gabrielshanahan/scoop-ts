@@ -23,6 +23,9 @@ if (!tsFile) {
     process.exit(2)
 }
 const budgetSeconds = Number(process.env.FILE_SOAK_SECONDS ?? "1800")
+// Optional: run only tests whose name matches (anchored) — one test per process, which also
+// preserves the DB state of a failing iteration for the post-mortem dump below.
+const testFilter = process.env.FILE_SOAK_TEST
 const stopOnFlake = process.env.FILE_SOAK_STOP_ON_FLAKE !== "0"
 const MAX_REPROVISIONS = 10
 
@@ -63,7 +66,13 @@ let reprovisions = 0
 while (Date.now() < deadline) {
     const result = spawnSync(
         process.execPath,
-        ["--import", "tsx", "--test", tsFile],
+        [
+            "--import",
+            "tsx",
+            "--test",
+            ...(testFilter ? [`--test-name-pattern=^${testFilter}$`] : []),
+            tsFile,
+        ],
         {
             cwd: root,
             env: { ...process.env, DATABASE_URL: container.getConnectionUri() },
@@ -89,7 +98,28 @@ while (Date.now() < deadline) {
             continue
         }
         const logPath = join(root, `file-flake-${flakes}.log`)
-        writeFileSync(logPath, output)
+        // Post-mortem: capture the message_event log as the failing process left it (only
+        // meaningful with FILE_SOAK_TEST — otherwise later tests' TRUNCATEs already wiped it).
+        let dump = ""
+        try {
+            const sql = postgres(container.getConnectionUri(), { max: 1 })
+            const events = await sql`
+                SELECT id, message_id, type, coroutine_name, step, cooperation_lineage::text,
+                       created_at::text, child_failure_handler_iteration, next_step
+                FROM message_event ORDER BY created_at, id
+            `
+            const messages = await sql`SELECT id, topic, created_at::text FROM message ORDER BY created_at`
+            await sql.end()
+            dump =
+                "\n=== POST-MORTEM message table ===\n" +
+                messages.map(row => JSON.stringify(row)).join("\n") +
+                "\n=== POST-MORTEM message_event table ===\n" +
+                events.map(row => JSON.stringify(row)).join("\n") +
+                "\n"
+        } catch (e) {
+            dump = `\n=== POST-MORTEM dump failed: ${e} ===\n`
+        }
+        writeFileSync(logPath, output + dump)
         flakes++
         console.log(`FLAKE at iteration ${iterations + 1} — ${logPath}`)
         if (stopOnFlake) {

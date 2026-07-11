@@ -251,13 +251,19 @@ export class MessageEventRepository {
                     FROM message_event
                     WHERE type = 'EMITTED'
                         AND cooperation_lineage = :cooperationLineage::uuid[]
-                        AND created_at < :suspendedAt::timestamptz
+                        -- :suspendedAt goes through ::text so postgres.js binds the string
+                        -- verbatim: a param bound directly at a ::timestamptz placeholder is
+                        -- serialized client-side through a JS Date, which silently truncates
+                        -- to milliseconds — and a truncated boundary empties this window
+                        -- whenever the emission and its suspension share a millisecond
+                        -- (see DECISIONS.md).
+                        AND created_at < :suspendedAt::text::timestamptz
                         AND NOT EXISTS (
                             SELECT 1 FROM message_event mid
                             WHERE mid.cooperation_lineage = :cooperationLineage::uuid[]
                               AND mid.type = 'SUSPENDED'
                               AND mid.created_at > message_event.created_at
-                              AND mid.created_at < :suspendedAt::timestamptz
+                              AND mid.created_at < :suspendedAt::text::timestamptz
                         )
                 )
                 INSERT INTO message_event (
