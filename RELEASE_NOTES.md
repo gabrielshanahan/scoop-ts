@@ -6,12 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## Unreleased
 
+### Fixed
+
+- **Rollback-path deadlines now actually fire.** The deadline element serialized under
+  `RollbackPathDeadlineKey` while the give-up SQL (and the V2 partial index) check
+  `RollbackDeadlineKey`, so a rollback exceeding its deadline just kept running — a latent bug
+  inherited from the Kotlin original, now fixed in both repos: the key serializes as
+  `RollbackDeadlineKey`. No migration needed (the existing V2 index already matches). Rows
+  written by older versions keep the old key and remain unenforced, exactly as before.
+
 ### Added
 
 - Port-added regression tests (`test/portregressions/`) deterministically reconstructing the
-  four port-found bugs: same-lineage `created_at` microsecond ties, `::timestamptz` bind
-  truncation, the subscribe/LISTEN registration window, and client-clock-skew stalls of the
-  `ignoreOlderThan` cutoff. See PORT-LEDGER.md "Port-added regression tests".
+  five port-found bugs: same-lineage `created_at` microsecond ties, `::timestamptz` bind
+  truncation, the subscribe/LISTEN registration window, client-clock-skew stalls of the
+  `ignoreOlderThan` cutoff, and never-firing rollback-path deadlines. See PORT-LEDGER.md
+  "Port-added regression tests".
 - CI (`build.yml`: typecheck, ledger reconciliation, full suite against Postgres, publishable
   artifact check) and manual release workflow (`release.yml`: version bump, test, npm publish
   with provenance, release-notes stamp, tag), mirroring the Kotlin repo's setup.

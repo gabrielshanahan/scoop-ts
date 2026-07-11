@@ -45,8 +45,8 @@ export function absoluteDeadlineMissed(seen: string): string {
  * against the current time, returning a constructed CooperationFailure when missed.
  *
  * The deadline/key names are derived exactly as in the original ("rollback" yields
- * 'RollbackDeadlineKey' even though the rollback deadline element's actual key serializes as
- * 'RollbackPathDeadlineKey' — a latent mismatch in the original, preserved faithfully).
+ * 'RollbackDeadlineKey', which is the name the rollback deadline element serializes under —
+ * see RollbackPathDeadline.ts).
  */
 export function deadlineMissed(seen: string, deadlineType: string, eventTypes: string[]): string {
     const deadline = `${capitalizeWords(deadlineType).split(" ").join("")}Deadline`

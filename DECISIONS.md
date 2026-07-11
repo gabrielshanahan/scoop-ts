@@ -199,16 +199,17 @@ condition; see PORT-LEDGER.md "Port-added regression tests").
   `new MappedKey(name, reviveElement)` takes both explicitly. Same for `Topic`, `VariableName`,
   and `Handler` names. `VariableName` keeps its polymorphic `_type` discriminator via a
   registry + `toJSON`.
-- **Preserved quirk — rollback deadline key mismatch (a latent bug)**: the original's rollback
-  deadline element serializes under `RollbackPathDeadlineKey` (class simple name) while the
-  generated give-up SQL checks `RollbackDeadlineKey`. Consequence: the `context ?
-  'RollbackDeadlineKey'` predicate can never be true, so **rollback-path deadlines are never
-  enforced** — a rollback exceeding its deadline just keeps running (the V2 index on
-  `RollbackDeadlineKey` guards an always-empty set for the same reason). The original has zero
-  test coverage of rollback deadlines, which is how the mismatch survived. Reproduced as-is for
-  behavioral parity; fixing it means changing the key (or the SQL derivation) plus the V2 index
-  in BOTH repos together, with a new test that a missed rollback deadline actually produces
-  ROLLBACK_FAILED.
+- **Fixed (in both repos) — rollback deadline key mismatch**: the original's rollback deadline
+  element serialized under `RollbackPathDeadlineKey` (class simple name) while the generated
+  give-up SQL checks `RollbackDeadlineKey`, so the `context ? 'RollbackDeadlineKey'` predicate
+  could never be true and **rollback-path deadlines were never enforced** — a rollback exceeding
+  its deadline just kept running (the V2 index on `RollbackDeadlineKey` guarded an always-empty
+  set). The original has zero test coverage of rollback deadlines, which is how the mismatch
+  survived. Fix: the key now serializes as `RollbackDeadlineKey` (matching the SQL and the
+  existing V2 index — no migration needed) here and in the Kotlin repo. Rows written by older
+  versions keep the old key and remain unenforced, exactly as before, so there is no upgrade
+  regression. Guarded by the port-added regression test "a missed rollback-path deadline
+  produces ROLLBACK_FAILED".
 - **Context deserialization via JSON.parse + re-stringify**: the Kotlin module reconstructs each
   top-level value's text from the token stream; here each value is `JSON.parse`d and re-emitted
   with `JSON.stringify`, which is canonical w.r.t. this codec's own output. Caveat: objects with

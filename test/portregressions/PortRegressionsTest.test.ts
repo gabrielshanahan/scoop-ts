@@ -7,8 +7,9 @@ import { transactional } from "../../src/coroutine/TransactionRunner.js"
 import { eventLoopStrategy } from "../../src/messaging/HandlerRegistry.js"
 import { PostgresTopicNotifier } from "../../src/node/PostgresTopicNotifier.js"
 import { Scoop } from "../../src/Scoop.js"
+import { rollbackPathTimeout } from "../../src/coroutine/eventloop/deadline/RollbackPathDeadline.js"
 import { nowMillis, setClock } from "../../src/util/Clock.js"
-import { setupScoopTest } from "../support/harness.js"
+import { setupScoopTest, waitUntil } from "../support/harness.js"
 import { CountDownLatch, sleep } from "../support/latch.js"
 
 const h = setupScoopTest()
@@ -205,6 +206,67 @@ describe("PortRegressionsTest", () => {
             }
         } finally {
             setClock({ nowMillis: () => Date.now() + baseOffset })
+        }
+    })
+
+    test("a missed rollback-path deadline produces ROLLBACK_FAILED", async () => {
+        // DECISIONS.md "rollback deadline key mismatch": the deadline element used to serialize
+        // under 'RollbackPathDeadlineKey' while the give-up SQL checks 'RollbackDeadlineKey',
+        // so rollback-path deadlines could never fire (latent in the Kotlin original — which
+        // has zero rollback-deadline coverage — and inherited by the port until fixed). With an
+        // already-expired rollback deadline attached at launch, the first rollback resume must
+        // give up: ROLLBACK_FAILED, no rollback lambda ever runs.
+        let rollbackRan = false
+        const failing = new Error("boom")
+        const subscription = await h.subscribe(
+            "rb-deadline-topic",
+            saga("rb-deadline-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
+                b.step({
+                    invoke: () => {},
+                    rollback: () => {
+                        rollbackRan = true
+                    },
+                })
+                b.step({
+                    invoke: () => {
+                        throw failing
+                    },
+                })
+            }),
+        )
+        try {
+            const root = await transactional(h.sql, connection =>
+                h.messageQueue.launch(
+                    connection,
+                    "rb-deadline-topic",
+                    {},
+                    rollbackPathTimeout(0, "regression test"),
+                ),
+            )
+            await waitUntil(
+                async () =>
+                    (
+                        await h.sql`
+                            SELECT 1 FROM message_event
+                            WHERE type = 'ROLLBACK_FAILED' AND message_id = ${root.message.id}`
+                    ).length > 0,
+                10_000,
+                "ROLLBACK_FAILED for the expired rollback deadline",
+            )
+            assert.ok(
+                !rollbackRan,
+                "give-up must preempt the rollback path — no rollback lambda may run",
+            )
+            const [row] = await h.sql`
+                SELECT string_agg(exception::text, '') AS exceptions
+                FROM message_event
+                WHERE message_id = ${root.message.id} AND exception IS NOT NULL`
+            assert.ok(
+                String(row!.exceptions).includes("MissedRollbackDeadline"),
+                "the failure must be attributed to the missed rollback deadline",
+            )
+        } finally {
+            await subscription.close()
         }
     })
 })

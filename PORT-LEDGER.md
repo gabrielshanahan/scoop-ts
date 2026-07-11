@@ -425,6 +425,11 @@ Mechanical proof: `npm run reconcile` re-derives the inventory from the Kotlin r
 (63 main files, 195 @Test methods), checks every entry appears in this ledger with no `pending`
 status, and verifies each ported TS test file contains exactly the ledgered number of test cases.
 
+Reference commit: `11251ea0a0261d182e4ffc854c752b211e09e0c0` (v0.4.0) — the Kotlin master state
+this ledger was reconciled against. reconcile.ts reads the reference repo AT this commit (via
+`git show`), so later upstream changes — e.g. the fixes backported from this port — don't drift
+the proof.
+
 ## Stability proof
 
 The zero-flakiness bar was proven on commit `272b013` with a three-phase chain, run
@@ -453,9 +458,9 @@ standard 10s).
 The engine-level fixes above are guarded by dedicated regression tests that construct each
 failure condition deterministically, so a regression fails outright instead of resurfacing as a
 soak flake. They live outside the ported inventory (the 195-count above is untouched); the full
-suite is therefore 199 tests.
+suite is therefore 200 tests.
 
-### test/portregressions/PortRegressionsTest.test.ts (4 tests) — port-added
+### test/portregressions/PortRegressionsTest.test.ts (5 tests) — port-added
 
 | # | Test | Status | Notes |
 |---|---|---|---|
@@ -463,10 +468,4 @@ suite is therefore 199 tests.
 | 2 | rollback window keeps microsecond precision through the suspendedAt bind | verified | `::text::timestamptz` fix; port-specific; scripts/scratch-window-repro.ts |
 | 3 | a message published after ready() is delivered without the reconcile safety net | verified | `Subscription.ready()` contract; safety net set to 600s so it cannot rescue the test |
 | 4 | ignoreOlderThan anchored to the database clock survives client-clock skew | verified | +1s injected skew; DB-anchored cutoff; latent in the Kotlin original |
-
-Known-but-preserved (NOT regression-tested, deliberately): the rollback-path deadline key
-mismatch — the deadline element serializes under `RollbackPathDeadlineKey` while the give-up SQL
-checks `RollbackDeadlineKey`, so rollback-path deadlines can never fire. Latent in the Kotlin
-original (which has zero test coverage of rollback deadlines); preserved for behavioral parity.
-A test would only cement the broken behavior — fix it in both repos together instead (see
-DECISIONS.md "Preserved quirk").
+| 5 | a missed rollback-path deadline produces ROLLBACK_FAILED | verified | RollbackDeadlineKey rename; latent in the Kotlin original (rollback deadlines never fired); fixed in both repos together |

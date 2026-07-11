@@ -7,7 +7,8 @@
  *     were ported from each Kotlin file.
  * Exits non-zero if anything fails to reconcile.
  */
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs"
+import { execFileSync } from "node:child_process"
+import { existsSync, readFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
 
@@ -76,35 +77,33 @@ check(
 )
 
 // --- 2. Cross-check against the Kotlin reference repo ------------------------------------------
-if (existsSync(kotlinRepo)) {
-    console.log(`Reference repo cross-check (${kotlinRepo}):`)
+// The ledger records the exact upstream commit it was reconciled against; the reference repo is
+// read AT that commit (git show), so upstream master moving (e.g. fixes backported from this
+// port) doesn't drift the proof.
+const referenceCommit = /^Reference commit: `([0-9a-f]{40})`/m.exec(ledger)?.[1]
+check(referenceCommit !== undefined, "ledger records the reference commit")
+if (existsSync(kotlinRepo) && referenceCommit) {
+    console.log(`Reference repo cross-check (${kotlinRepo} @ ${referenceCommit.slice(0, 7)}):`)
     const kotlinTests = new Map<string, string[]>()
     const kotlinMain: string[] = []
     const testPattern = /@Test\b[^\n]*\n(?:\s*@\w+(?:\([^)]*\))?\s*\n)*\s*fun\s+(?:`([^`]+)`|(\w+))/g
 
-    function walk(dir: string, files: string[]): void {
-        for (const entry of readdirSync(dir)) {
-            const path = join(dir, entry)
-            if (statSync(path).isDirectory()) {
-                walk(path, files)
-            } else if (entry.endsWith(".kt")) {
-                files.push(path)
-            }
-        }
-    }
+    const git = (...args: string[]): string =>
+        execFileSync("git", ["-C", kotlinRepo, ...args], { encoding: "utf-8" })
+    const allFiles = git("ls-tree", "-r", "--name-only", referenceCommit)
+        .split("\n")
+        .filter(Boolean)
 
     for (const module of ["scoop-core", "scoop-quarkus"]) {
         for (const kind of ["main", "test"]) {
-            const base = join(kotlinRepo, module, "src", kind, "kotlin")
-            if (!existsSync(base)) continue
-            const files: string[] = []
-            walk(base, files)
-            for (const file of files) {
-                const rel = file.slice(file.indexOf("kotlin/") + "kotlin/".length)
+            const prefix = `${module}/src/${kind}/kotlin/`
+            for (const file of allFiles) {
+                if (!file.startsWith(prefix) || !file.endsWith(".kt")) continue
+                const rel = file.slice(prefix.length)
                 if (kind === "main") {
                     kotlinMain.push(rel)
                 } else {
-                    const source = readFileSync(file, "utf-8")
+                    const source = git("show", `${referenceCommit}:${file}`)
                     const names = [...source.matchAll(testPattern)].map(
                         testMatch => testMatch[1] ?? testMatch[2]!,
                     )
@@ -145,7 +144,7 @@ if (existsSync(kotlinRepo)) {
         }
     }
 } else {
-    console.log(`Reference repo not found at ${kotlinRepo} — skipping cross-check.`)
+    console.log(`Reference repo not found at ${kotlinRepo} (or no pinned commit) — skipping cross-check.`)
 }
 
 // --- 3. TS-side counts --------------------------------------------------------------------------

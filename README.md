@@ -91,7 +91,7 @@ Requires Docker (one PostgreSQL testcontainer is started per run) and Node ≥ 2
 
 ```sh
 npm install
-npm test                        # full suite (199 tests), sequential, TRUNCATE-isolated
+npm test                        # full suite (200 tests), sequential, TRUNCATE-isolated
 npm test -- --shuffle           # randomized file order (prints the seed)
 npm test -- --shuffle=12345     # reproduce a specific order
 npm test -- test/coroutine/structuredcooperation/RollbackPathTest.test.ts   # one file
@@ -104,9 +104,9 @@ The suite is the Kotlin suite ported test-for-test: 195 `@Test` methods across 2
 original brief's "219" substring-counts `@TestInstance`/`@TestProfile` annotations; see
 PORT-LEDGER.md). JVM-specific tests assert the equivalent guarantee on this stack
 (JTA atomicity → `sql.begin()` atomicity; Vert.x LISTEN/NOTIFY → postgres.js LISTEN/NOTIFY).
-On top of the ported inventory, `test/portregressions/` adds 4 regression tests that
+On top of the ported inventory, `test/portregressions/` adds 5 regression tests that
 deterministically reconstruct the port-found bugs (PORT-LEDGER.md "Port-added regression
-tests") — 199 tests total.
+tests") — 200 tests total.
 
 The suite is deterministic, not just green: a 2-hour whole-file soak of RollbackPathTest
 (535 iterations), a per-test soak of all 195 tests (each looped with DB cleanup on the edges),
