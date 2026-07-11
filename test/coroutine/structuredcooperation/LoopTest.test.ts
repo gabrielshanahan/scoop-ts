@@ -2,8 +2,8 @@ import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { Continue, Repeat } from "../../../src/coroutine/DistributedCoroutine.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
+import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import { getEventSequence, triple } from "../../support/util.js"
@@ -39,7 +39,9 @@ describe("LoopTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -92,7 +94,9 @@ describe("LoopTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -128,7 +132,9 @@ describe("LoopTest", () => {
                 b.controlledStep({
                     name: "loop-step",
                     invoke: async (scope, _message, iteration) => {
-                        await scope.launch(h.childTopic, { from: `loop-iter-${iteration}` })
+                        await scope.launch(h.childTopic, {
+                            from: `loop-iter-${iteration}`,
+                        })
                         executionOrder.push(`loop-step-iter-${iteration}`)
                         latch.countDown()
                         return ++loopCounter < 2 ? Repeat : Continue
@@ -158,7 +164,9 @@ describe("LoopTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -255,7 +263,9 @@ describe("LoopTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -288,10 +298,26 @@ describe("LoopTest", () => {
                 triple("ROLLING_BACK", "0", "child-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler"),
                 triple("ROLLING_BACK", "step-with-children", "root-handler"),
-                triple("ROLLBACK_EMITTED", "Rollback of step-with-children[0,0] (rolling back child scopes)", "root-handler"),
-                triple("SUSPENDED", "Rollback of step-with-children[0,0] (rolling back child scopes)", "root-handler"),
-                triple("ROLLBACK_EMITTED", "Rollback of step-with-children[0,] (rolling back child scopes)", "root-handler"),
-                triple("SUSPENDED", "Rollback of step-with-children[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "ROLLBACK_EMITTED",
+                    "Rollback of step-with-children[0,0] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of step-with-children[0,0] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "ROLLBACK_EMITTED",
+                    "Rollback of step-with-children[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of step-with-children[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of step-with-children[0,]", "root-handler"),
                 triple("ROLLED_BACK", "Rollback of step-with-children[0,]", "root-handler"),
             ])
@@ -332,7 +358,9 @@ describe("LoopTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -359,9 +387,17 @@ describe("LoopTest", () => {
                 triple("SUSPENDED", "loop-step", "root-handler"),
                 triple("SUSPENDED", "loop-step", "root-handler"),
                 triple("ROLLING_BACK", "loop-step", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-step[1,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-step[1,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-step[1,]", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-step[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-step[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-step[0,]", "root-handler"),
                 triple("ROLLED_BACK", "Rollback of loop-step[0,]", "root-handler"),
             ])
@@ -401,7 +437,9 @@ describe("LoopTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -418,7 +456,11 @@ describe("LoopTest", () => {
                 triple("SEEN", null, "root-handler"),
                 triple("SUSPENDED", "loop-step", "root-handler"),
                 triple("ROLLING_BACK", "failing-step", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-step[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-step[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-step[0,]", "root-handler"),
                 triple("ROLLED_BACK", "Rollback of loop-step[0,]", "root-handler"),
             ])
@@ -470,7 +512,9 @@ describe("LoopTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -504,13 +548,29 @@ describe("LoopTest", () => {
                 triple("SUSPENDED", "loop-step", "root-handler"),
                 triple("SUSPENDED", "middle-step", "root-handler"),
                 triple("ROLLING_BACK", "failing-step", "root-handler"),
-                triple("SUSPENDED", "Rollback of middle-step[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of middle-step[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of middle-step[0,]", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-step[2,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-step[2,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-step[2,]", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-step[1,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-step[1,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-step[1,]", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-step[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-step[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-step[0,]", "root-handler"),
                 triple("ROLLED_BACK", "Rollback of loop-step[0,]", "root-handler"),
             ])
@@ -564,7 +624,9 @@ describe("LoopTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -596,13 +658,29 @@ describe("LoopTest", () => {
                 triple("SUSPENDED", "loop-B", "root-handler"),
                 triple("SUSPENDED", "loop-B", "root-handler"),
                 triple("ROLLING_BACK", "failing-step", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-B[1,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-B[1,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-B[1,]", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-B[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-B[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-B[0,]", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-A[1,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-A[1,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-A[1,]", "root-handler"),
-                triple("SUSPENDED", "Rollback of loop-A[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of loop-A[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of loop-A[0,]", "root-handler"),
                 triple("ROLLED_BACK", "Rollback of loop-A[0,]", "root-handler"),
             ])
@@ -685,7 +763,9 @@ describe("LoopTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -715,17 +795,41 @@ describe("LoopTest", () => {
                 triple("SUSPENDED", "0", "child-handler"),
                 triple("COMMITTED", "0", "child-handler"),
                 triple("ROLLING_BACK", "failing-step", "root-handler"),
-                triple("ROLLBACK_EMITTED", "Rollback of step-with-child[0,] (rolling back child scopes)", "root-handler"),
-                triple("SUSPENDED", "Rollback of step-with-child[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "ROLLBACK_EMITTED",
+                    "Rollback of step-with-child[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of step-with-child[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("ROLLING_BACK", null, "child-handler"),
-                triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "child-handler",
+                ),
                 triple("ROLLBACK_FAILED", "Rollback of 0[0,]", "child-handler"),
-                triple("EMITTED", "Rollback of step-with-child[0,] (rolling back child scopes)", "root-handler"),
-                triple("SUSPENDED", "Rollback of step-with-child[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "EMITTED",
+                    "Rollback of step-with-child[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of step-with-child[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SEEN", null, "grandchild-handler"),
                 triple("ROLLING_BACK", "0", "grandchild-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "grandchild-handler"),
-                triple("ROLLBACK_FAILED", "Rollback of step-with-child[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "ROLLBACK_FAILED",
+                    "Rollback of step-with-child[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
             ])
         } finally {
             await rootSubscription.close()

@@ -1,0 +1,41 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.5.3/schema.json",
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    },
+    "files": {
+        "includes": ["src/**", "test/**", "scripts/**"]
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 100
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "double",
+            "semicolons": "asNeeded",
+            "trailingCommas": "all",
+            "arrowParentheses": "asNeeded"
+        }
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "preset": "recommended",
+            "style": {
+                "noNonNullAssertion": "off"
+            },
+            "suspicious": {
+                // The CooperationContext codec is a dynamic-JSON boundary (revivers, mapped
+                // keys) where `any` is deliberate; strict tsconfig still governs everything.
+                "noExplicitAny": "off",
+                // `while ((match = regex.exec(...)))` loops in the reconcile/soak scripts.
+                "noAssignInExpressions": "off"
+            }
+        }
+    }
+}

@@ -9,8 +9,8 @@
  */
 import { execFileSync } from "node:child_process"
 import { existsSync, readFileSync } from "node:fs"
-import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 const kotlinRepo =
@@ -86,7 +86,8 @@ if (existsSync(kotlinRepo) && referenceCommit) {
     console.log(`Reference repo cross-check (${kotlinRepo} @ ${referenceCommit.slice(0, 7)}):`)
     const kotlinTests = new Map<string, string[]>()
     const kotlinMain: string[] = []
-    const testPattern = /@Test\b[^\n]*\n(?:\s*@\w+(?:\([^)]*\))?\s*\n)*\s*fun\s+(?:`([^`]+)`|(\w+))/g
+    const testPattern =
+        /@Test\b[^\n]*\n(?:\s*@\w+(?:\([^)]*\))?\s*\n)*\s*fun\s+(?:`([^`]+)`|(\w+))/g
 
     const git = (...args: string[]): string =>
         execFileSync("git", ["-C", kotlinRepo, ...args], { encoding: "utf-8" })
@@ -120,10 +121,7 @@ if (existsSync(kotlinRepo) && referenceCommit) {
         kotlinTestTotal === 195,
         `reference repo has 195 @Test methods (found ${kotlinTestTotal})`,
     )
-    check(
-        kotlinMain.length === 63,
-        `reference repo has 63 main files (found ${kotlinMain.length})`,
-    )
+    check(kotlinMain.length === 63, `reference repo has 63 main files (found ${kotlinMain.length})`)
 
     const ledgerMainFiles = new Set(mainFileRows.map(row => row[1]!))
     for (const file of kotlinMain) {
@@ -144,7 +142,9 @@ if (existsSync(kotlinRepo) && referenceCommit) {
         }
     }
 } else {
-    console.log(`Reference repo not found at ${kotlinRepo} (or no pinned commit) — skipping cross-check.`)
+    console.log(
+        `Reference repo not found at ${kotlinRepo} (or no pinned commit) — skipping cross-check.`,
+    )
 }
 
 // --- 3. TS-side counts --------------------------------------------------------------------------

@@ -1,11 +1,11 @@
 import type { TransactionSql } from "postgres"
 import type { JsonValue } from "../JsonbHelper.js"
 import type { Message } from "../messaging/Message.js"
-import type { CooperationContext } from "./context/CooperationContext.js"
 import type { ChildScopeIdentifier } from "./CooperationScopeIdentifier.js"
+import type { CooperationContext } from "./context/CooperationContext.js"
 import type { Continuation } from "./continuation/Continuation.js"
-import type { CooperationRoot } from "./structuredcooperation/Capabilities.js"
 import type { Handler } from "./Handler.js"
+import type { CooperationRoot } from "./structuredcooperation/Capabilities.js"
 import type { VariableName } from "./VariableName.js"
 
 /**

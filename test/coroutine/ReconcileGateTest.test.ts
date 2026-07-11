@@ -39,7 +39,10 @@ describe("ReconcileGateTest", () => {
         const g = gate()
         // Fresh gate is armed; it drains a short quiet tail of empty passes then goes idle.
         const passes = drainUntilIdle(g, 0)
-        assert.ok(passes >= 1 && passes <= 10, `should reconcile a small bounded tail, was ${passes}`)
+        assert.ok(
+            passes >= 1 && passes <= 10,
+            `should reconcile a small bounded tail, was ${passes}`,
+        )
         assert.ok(!g.shouldReconcile(secondsAsNanos(1)), "idle after the tail")
     })
 

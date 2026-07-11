@@ -2,10 +2,10 @@ import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { periodic, scheduledStep, sleepForStep } from "../../../src/coroutine/builder/Sleep.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
+import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { isoFromNowMillis, nowMillis } from "../../../src/util/Clock.js"
-import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
+import { eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import { getEventSequence, triple } from "../../support/util.js"
 
@@ -17,25 +17,31 @@ describe("SleepTest", () => {
         let step1Time = 0
         let step3Time = 0
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
-            b.step({
-                invoke: (_scope, _message) => {
-                    step1Time = nowMillis()
-                },
-            })
-            sleepForStep(b, 500)
-            b.step({
-                invoke: (_scope, _message) => {
-                    step3Time = nowMillis()
-                    latch.countDown()
-                },
-            })
-        })
+        const rootHandlerCoroutine = saga(
+            "root-handler",
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
+            b => {
+                b.step({
+                    invoke: (_scope, _message) => {
+                        step1Time = nowMillis()
+                    },
+                })
+                sleepForStep(b, 500)
+                b.step({
+                    invoke: (_scope, _message) => {
+                        step3Time = nowMillis()
+                        latch.countDown()
+                    },
+                })
+            },
+        )
         const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
@@ -64,17 +70,23 @@ describe("SleepTest", () => {
         let scheduledStepTime = ""
         const startAfter = isoFromNowMillis(500)
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
-            scheduledStep(b, String(b.steps.length), startAfter, (_scope, _message) => {
-                scheduledStepTime = isoFromNowMillis(0)
-                latch.countDown()
-            })
-        })
+        const rootHandlerCoroutine = saga(
+            "root-handler",
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
+            b => {
+                scheduledStep(b, String(b.steps.length), startAfter, (_scope, _message) => {
+                    scheduledStepTime = isoFromNowMillis(0)
+                    latch.countDown()
+                })
+            },
+        )
         const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
@@ -105,20 +117,26 @@ describe("SleepTest", () => {
         const runEveryMillis = 400
         const times: number[] = []
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
-            periodic(b, runEveryMillis, 3)
-            b.step({
-                invoke: (_scope, _message) => {
-                    times.push(nowMillis())
-                    latch.countDown()
-                },
-            })
-        })
+        const rootHandlerCoroutine = saga(
+            "root-handler",
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
+            b => {
+                periodic(b, runEveryMillis, 3)
+                b.step({
+                    invoke: (_scope, _message) => {
+                        times.push(nowMillis())
+                        latch.countDown()
+                    },
+                })
+            },
+        )
         const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")

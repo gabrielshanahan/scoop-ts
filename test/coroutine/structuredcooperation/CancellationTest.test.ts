@@ -1,8 +1,8 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
+import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { ciSleep, eventLogSettled, setupScoopTest, waitUntil } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import {
@@ -23,19 +23,23 @@ describe("CancellationTest", () => {
         const childIsExecuting = new CountDownLatch(1)
         const cancellation = new CountDownLatch(1)
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
-            b.step({
-                invoke: async (scope, _message) => {
-                    await scope.launch(h.childTopic, { from: "root-handler" })
-                    latch.countDown()
-                    executionOrder.push("root-handler-step-1")
-                },
-                rollback: (_scope, _message, _throwable) => {
-                    latch.countDown()
-                    executionOrder.push("root-handler-rollback-step-1")
-                },
-            })
-        })
+        const rootHandlerCoroutine = saga(
+            "root-handler",
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
+            b => {
+                b.step({
+                    invoke: async (scope, _message) => {
+                        await scope.launch(h.childTopic, { from: "root-handler" })
+                        latch.countDown()
+                        executionOrder.push("root-handler-step-1")
+                    },
+                    rollback: (_scope, _message, _throwable) => {
+                        latch.countDown()
+                        executionOrder.push("root-handler-rollback-step-1")
+                    },
+                })
+            },
+        )
         const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         const childHandlerCoroutine = saga(
@@ -77,11 +81,7 @@ describe("CancellationTest", () => {
             assert.equal(executionOrder.length, 3, "Not everything completed correctly")
             assert.deepEqual(
                 executionOrder,
-                [
-                    "root-handler-step-1",
-                    "child-handler-step-1",
-                    "root-handler-rollback-step-1",
-                ],
+                ["root-handler-step-1", "child-handler-step-1", "root-handler-rollback-step-1"],
                 "Execution order obeys structured cooperation rules",
             )
 
@@ -95,8 +95,16 @@ describe("CancellationTest", () => {
                 triple("ROLLING_BACK", "0", "child-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler"),
                 triple("ROLLING_BACK", "0", "root-handler"),
-                triple("ROLLBACK_EMITTED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
-                triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "ROLLBACK_EMITTED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "root-handler"),
             ])
@@ -214,12 +222,16 @@ describe("CancellationTest", () => {
             // The fixed 100ms settle in the original races slow commits: the cancel must happen
             // "after everything has finished running", so wait for that exact condition (both
             // sagas COMMITTED) — the deterministic form of the same precondition (DECISIONS.md).
-            await waitUntil(async () => {
-                const [row] = await h.sql`
+            await waitUntil(
+                async () => {
+                    const [row] = await h.sql`
                     SELECT count(*)::int AS committed FROM message_event WHERE type = 'COMMITTED'
                 `
-                return Number(row!.committed) >= 2
-            }, 10_000, "both sagas to commit")
+                    return Number(row!.committed) >= 2
+                },
+                10_000,
+                "both sagas to commit",
+            )
 
             await transactional(h.sql, async connection => {
                 await h.scoop.capabilities.cancel(

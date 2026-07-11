@@ -1,13 +1,11 @@
 import type { TransactionSql } from "postgres"
 import { logger } from "../../logging.js"
 import type { Message } from "../../messaging/Message.js"
-import type { CooperationContext } from "../context/CooperationContext.js"
 import type { CooperationScope } from "../CooperationScope.js"
-import type { ChildScopeIdentifier } from "../CooperationScopeIdentifier.js"
-import { DistributedCoroutine, NextStep, TransactionalStep } from "../DistributedCoroutine.js"
+import type { DistributedCoroutine, NextStep, TransactionalStep } from "../DistributedCoroutine.js"
 import type { CoroutineState, StepInstance } from "../EventLoop.js"
 import {
-    ChildFailureHandlerIteration,
+    type ChildFailureHandlerIteration,
     NO_CHILD_FAILURE,
 } from "../eventloop/SuspensionState.js"
 import type { ScopeCapabilities } from "../structuredcooperation/Capabilities.js"
@@ -16,7 +14,6 @@ import {
     BaseCooperationContinuation,
     BeforeFirstStep,
     BetweenSteps,
-    SuspensionPoint,
 } from "./CooperationContinuation.js"
 
 /**
@@ -38,28 +35,6 @@ export const ROLLING_BACK_CHILD_SCOPES_STEP_SUFFIX = " (rolling back child scope
 const log = logger("RollbackPathContinuation")
 
 export class RollbackPathContinuation extends BaseCooperationContinuation {
-    constructor(
-        connection: TransactionSql,
-        context: CooperationContext,
-        scopeIdentifier: ChildScopeIdentifier,
-        suspensionPoint: SuspensionPoint,
-        distributedCoroutine: DistributedCoroutine,
-        scopeCapabilities: ScopeCapabilities,
-        stepIteration: number,
-        childFailureHandlerIteration: ChildFailureHandlerIteration,
-    ) {
-        super(
-            connection,
-            context,
-            scopeIdentifier,
-            suspensionPoint,
-            distributedCoroutine,
-            scopeCapabilities,
-            stepIteration,
-            childFailureHandlerIteration,
-        )
-    }
-
     giveUpStrategy(seen: string): string {
         return this.distributedCoroutine.eventLoopStrategy.giveUpOnRollbackPath(seen)
     }
@@ -265,11 +240,7 @@ function buildRollbackSteps(
             invoke(): Promise<NextStep> {
                 throw new Error("Should never be invoked")
             },
-            rollback(
-                scope: CooperationScope,
-                _message: Message,
-                throwable: Error,
-            ): Promise<void> {
+            rollback(scope: CooperationScope, _message: Message, throwable: Error): Promise<void> {
                 return scopeCapabilities.emitRollbacksForEmissions(
                     scope,
                     instance.suspendedAt,
@@ -317,13 +288,7 @@ function buildRollbackSteps(
                     _stepIteration: number,
                     childFailureHandlerIteration: ChildFailureHandlerIteration,
                 ): Promise<void> {
-                    return step.rollback(
-                        scope,
-                        message,
-                        throwable,
-                        0,
-                        childFailureHandlerIteration,
-                    )
+                    return step.rollback(scope, message, throwable, 0, childFailureHandlerIteration)
                 },
                 handleChildFailures(
                     scope: CooperationScope,

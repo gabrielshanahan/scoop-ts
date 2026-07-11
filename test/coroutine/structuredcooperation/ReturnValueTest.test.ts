@@ -1,14 +1,14 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
-import { DistributedCoroutine } from "../../../src/coroutine/DistributedCoroutine.js"
+import type { DistributedCoroutine } from "../../../src/coroutine/DistributedCoroutine.js"
 import { Handler } from "../../../src/coroutine/Handler.js"
 import { Topic } from "../../../src/coroutine/Topic.js"
+import { transactional } from "../../../src/coroutine/TransactionRunner.js"
 import { VariableName } from "../../../src/coroutine/VariableName.js"
 import type { JsonValue } from "../../../src/JsonbHelper.js"
 import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
-import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
+import { eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 
 const h = setupScoopTest()
@@ -140,7 +140,9 @@ describe("ReturnValueTest", () => {
             saga("ChildHandler1", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
-                        await scope.storeReturnValue(TestResult, { result: "from-child-1" })
+                        await scope.storeReturnValue(TestResult, {
+                            result: "from-child-1",
+                        })
                     },
                 })
             }),
@@ -151,7 +153,9 @@ describe("ReturnValueTest", () => {
             saga("ChildHandler2", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
-                        await scope.storeReturnValue(TestResult, { result: "from-child-2" })
+                        await scope.storeReturnValue(TestResult, {
+                            result: "from-child-2",
+                        })
                     },
                 })
             }),

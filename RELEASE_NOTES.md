@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## Unreleased
 
+### Added
+
+- Lint/format gate: Biome (single dev dependency) wired into `npm run lint` / `npm run format`
+  and both workflows, configured to the existing house style (4-space indent, 100 columns,
+  double quotes, no semicolons). Mirrors the Kotlin repo's ktfmt+detekt gate.
+
+### Changed
+
+- Dependency majors adopted (full gate green on each): typescript 7, pino 10,
+  @testcontainers/postgresql 12. `@types/node` majors are dependabot-ignored — types track the
+  oldest supported runtime (`engines: >=22`), not the newest.
+
 ## v0.5.0 — 2026-07-11
 
 ### Fixed

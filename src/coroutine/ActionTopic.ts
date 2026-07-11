@@ -1,5 +1,5 @@
-import { Topic } from "./Topic.js"
 import type { ActionInput } from "./ActionInput.js"
+import { Topic } from "./Topic.js"
 
 /**
  * A topic for actions (handlers that return values). Wraps the payload type in [ActionInput],

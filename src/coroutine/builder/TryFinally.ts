@@ -1,6 +1,6 @@
 import type { Message } from "../../messaging/Message.js"
-import { CooperationContext, MappedElement, MappedKey } from "../context/CooperationContext.js"
 import type { CooperationScope } from "../CooperationScope.js"
+import { type CooperationContext, MappedElement, MappedKey } from "../context/CooperationContext.js"
 import type { SagaBuilder } from "./SagaBuilder.js"
 
 /**

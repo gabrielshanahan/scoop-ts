@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { createHash, randomUUID } from "node:crypto"
 import { describe, test } from "node:test"
-import { ContinuationIdentifier } from "../../../src/coroutine/continuation/ContinuationIdentifier.js"
+import type { ContinuationIdentifier } from "../../../src/coroutine/continuation/ContinuationIdentifier.js"
 import {
     ROLLING_BACK_CHILD_SCOPES_STEP_SUFFIX,
     ROLLING_BACK_PREFIX,
@@ -21,15 +21,15 @@ import {
     childSeens,
     finalSelect,
     latestSuspended,
+    type SQL,
     seenForProcessing,
-    SQL,
     terminatedChildRollingBacks,
     terminatedChildSeens,
 } from "../../../src/coroutine/structuredcooperation/PendingCoroutineRunSql.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
+import type { Message } from "../../../src/messaging/Message.js"
 import { queryNamed } from "../../../src/sql.js"
 import { nowIso } from "../../../src/util/Clock.js"
-import type { Message } from "../../../src/messaging/Message.js"
 import { setupScoopTest } from "../../support/harness.js"
 import { SqlTestUtils } from "../../support/SqlTestUtils.js"
 
@@ -100,7 +100,12 @@ class CoroutineProgressBuilder {
         return ROLLING_BACK_PREFIX + String(stepName)
     }
 
-    async emitted(topic: string, stepName: string | number, key = "key", value = "value"): Promise<Message> {
+    async emitted(
+        topic: string,
+        stepName: string | number,
+        key = "key",
+        value = "value",
+    ): Promise<Message> {
         const message = await utils().createSimpleMessage(topic, key, value)
         await utils().emitted(
             message.id,
@@ -696,9 +701,7 @@ describe("PendingCoroutineRunSqlTest", () => {
                 await coroutineProgress(await emitRootMessage(rootTopic), rootHandler, async c => {
                     const seenId3 = await c.seen()
                     await c.rollingBack(throwable, 0)
-                    await c.verify(waiting, result =>
-                        assertSeen(result, seenId1, seenId2, seenId3),
-                    )
+                    await c.verify(waiting, result => assertSeen(result, seenId1, seenId2, seenId3))
                 })
             })
 
@@ -881,9 +884,7 @@ describe("PendingCoroutineRunSqlTest", () => {
                 await coroutineProgress(await emitRootMessage(rootTopic), rootHandler, async c => {
                     const seenId3 = await c.seen()
                     await c.rollingBack(throwable, 0)
-                    await c.verify(waiting, result =>
-                        assertSeen(result, seenId1, seenId2, seenId3),
-                    )
+                    await c.verify(waiting, result => assertSeen(result, seenId1, seenId2, seenId3))
                 })
             })
 
@@ -1149,11 +1150,9 @@ describe("PendingCoroutineRunSqlTest", () => {
                 )
 
                 const result = await transactional(h.sql, async connection => {
-                    const locked = await queryNamed(
-                        connection,
-                        buildSql(seenForProcessingChain),
-                        { coroutine_name: c.distributedCoroutineIdentifier.name },
-                    )
+                    const locked = await queryNamed(connection, buildSql(seenForProcessingChain), {
+                        coroutine_name: c.distributedCoroutineIdentifier.name,
+                    })
                     assertSeenIsFor(locked, c.message.id)
                     // The analog of the Kotlin `thread { verify(...) }.join()`: the same query on
                     // a DIFFERENT connection must skip the locked row.

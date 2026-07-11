@@ -7,11 +7,12 @@
  * and that run number is retried: that is environment resilience, not test leniency. A failure
  * with a live database is a real failure and ends the campaign argument.
  */
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers/postgresql"
+
 import { spawnSync } from "node:child_process"
 import { writeFileSync } from "node:fs"
-import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
+import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql"
 import postgres from "postgres"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")

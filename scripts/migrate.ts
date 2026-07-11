@@ -1,6 +1,6 @@
-import postgres from "postgres"
-import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
+import postgres from "postgres"
 import { applyMigrations } from "../src/node/migrations.js"
 
 const url = process.env.DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/scoop"

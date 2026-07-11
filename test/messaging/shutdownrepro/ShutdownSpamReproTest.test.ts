@@ -1,11 +1,9 @@
 import assert from "node:assert/strict"
 import { after, before, describe, test } from "node:test"
-import postgres, { Sql } from "postgres"
-import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
-import { Scoop } from "../../../src/Scoop.js"
+import postgres, { type Sql } from "postgres"
 import type { Subscription } from "../../../src/messaging/Subscription.js"
 import { PostgresTopicNotifier } from "../../../src/node/PostgresTopicNotifier.js"
+import { Scoop } from "../../../src/Scoop.js"
 import { sleep } from "../../support/latch.js"
 import { registerReproSubscriptions, SUBSCRIPTION_COUNT } from "./ReproSubscriptionRegistrar.js"
 

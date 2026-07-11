@@ -58,6 +58,10 @@ jobs:
           echo "version=${next#v}" >> "$GITHUB_OUTPUT"
           echo "Bumped version to ${next}"
 
+      - name: Lint and format check
+        run: npm run lint
+        timeout-minutes: 5
+
       - name: Typecheck
         run: npm run typecheck
         timeout-minutes: 5

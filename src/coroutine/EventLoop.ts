@@ -3,56 +3,55 @@ import type { JsonbHelper } from "../JsonbHelper.js"
 import { logger } from "../logging.js"
 import type { Message } from "../messaging/Message.js"
 import { whileISaySo } from "../utils.js"
-import { emptyContext, CooperationContext } from "./context/CooperationContext.js"
-import {
-    buildHappyPathContinuation,
-} from "./continuation/HappyPathContinuation.js"
-import {
-    buildRollbackPathContinuation,
-} from "./continuation/RollbackPathContinuation.js"
 import type { CooperationScope } from "./CooperationScope.js"
 import { ChildScopeIdentifier } from "./CooperationScopeIdentifier.js"
-import { DistributedCoroutine, NextStep, Continue, Repeat, GoTo } from "./DistributedCoroutine.js"
+import { type CooperationContext, emptyContext } from "./context/CooperationContext.js"
+import type { ContinuationResult, LastStepResult } from "./continuation/Continuation.js"
+import {
+    ChildFailed,
+    SuccessfullyInvoked,
+    SuccessfullyRolledBack,
+} from "./continuation/Continuation.js"
+import { buildHappyPathContinuation } from "./continuation/HappyPathContinuation.js"
+import { buildRollbackPathContinuation } from "./continuation/RollbackPathContinuation.js"
+import {
+    Continue,
+    type DistributedCoroutine,
+    GoTo,
+    type NextStep,
+    Repeat,
+} from "./DistributedCoroutine.js"
 import { renderAsString } from "./DistributedCoroutineIdentifier.js"
 import {
-    ChildFailureHandlerIteration,
+    ChildrenFailedAndFailedToRollBack,
+    ChildrenFailedAndSuccessfullyRolledBack,
+    ChildrenFailedWhileRollingBackLastStep,
+    GUCCI,
+    type RollbackState,
+    SuccessfullyRolledBackLastStep,
+} from "./eventloop/RollbackState.js"
+import {
+    type ChildFailureHandlerIteration,
     HandlerIteration,
     LastStepFinished,
     NO_CHILD_FAILURE,
     NOT_SUSPENDED_YET,
     SuspendedAfterStepRollback,
     SuspendedBetweenSteps,
-    SuspensionState,
+    type SuspensionState,
 } from "./eventloop/SuspensionState.js"
-import {
-    ChildrenFailedAndFailedToRollBack,
-    ChildrenFailedAndSuccessfullyRolledBack,
-    ChildrenFailedWhileRollingBackLastStep,
-    GUCCI,
-    RollbackState,
-    SuccessfullyRolledBackLastStep,
-} from "./eventloop/RollbackState.js"
 import type { PeriodicTick } from "./PeriodicTick.js"
 import { ReconcileGate } from "./ReconcileGate.js"
 import { ScoopInfrastructureException } from "./ScoopInfrastructureException.js"
+import type { ScopeCapabilities } from "./structuredcooperation/Capabilities.js"
 import {
-    CooperationException,
-    CooperationFailure,
+    type CooperationException,
+    type CooperationFailure,
     cooperationFailureFromThrowable,
     toCooperationException,
 } from "./structuredcooperation/CooperationFailure.js"
-import type {
-    MessageEventRepository,
-    PendingCoroutineRun,
-} from "./structuredcooperation/MessageEventRepository.js"
-import type { ScopeCapabilities } from "./structuredcooperation/Capabilities.js"
-import { transactional, TransactionRunner } from "./TransactionRunner.js"
-import type { Continuation, ContinuationResult, LastStepResult } from "./continuation/Continuation.js"
-import {
-    ChildFailed,
-    SuccessfullyInvoked,
-    SuccessfullyRolledBack,
-} from "./continuation/Continuation.js"
+import type { MessageEventRepository } from "./structuredcooperation/MessageEventRepository.js"
+import { type TransactionRunner, transactional } from "./TransactionRunner.js"
 
 const log = logger("EventLoop")
 
@@ -164,7 +163,10 @@ export class EventLoop {
                             )
                             .catch(e => {
                                 log.error(
-                                    { err: e, coroutine: distributedCoroutine.identifier.toString() },
+                                    {
+                                        err: e,
+                                        coroutine: distributedCoroutine.identifier.toString(),
+                                    },
                                     "Error when starting continuations for coroutine",
                                 )
                                 throw e
@@ -372,7 +374,10 @@ export class EventLoop {
         }
 
         log.debug(
-            { coroutine: distributedCoroutine.identifier.toString(), id: result.messageId },
+            {
+                coroutine: distributedCoroutine.identifier.toString(),
+                id: result.messageId,
+            },
             "Processing message for coroutine",
         )
 
@@ -595,11 +600,7 @@ export class EventLoop {
                 } else {
                     nextStep = Continue
                 }
-                input = new ChildFailed(
-                    coroutineState.message,
-                    rollbackState.throwable,
-                    nextStep,
-                )
+                input = new ChildFailed(coroutineState.message, rollbackState.throwable, nextStep)
                 break
             }
         }
@@ -728,7 +729,8 @@ export class EventLoop {
               )
             : null
 
-        const iterationState = scope.continuation.continuationIdentifier.childFailureHandlerIteration
+        const iterationState =
+            scope.continuation.continuationIdentifier.childFailureHandlerIteration
         const childFailureHandlerIteration =
             iterationState.kind === "handlerIteration" ? iterationState.iteration : null
 

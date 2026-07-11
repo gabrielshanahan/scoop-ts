@@ -1,8 +1,8 @@
+import type { Message } from "../../messaging/Message.js"
 import { isoFromNowMillis } from "../../util/Clock.js"
+import type { CooperationScope } from "../CooperationScope.js"
 import { has, MappedElement, MappedKey } from "../context/CooperationContext.js"
 import { BaseEventLoopStrategy } from "../eventloop/strategy/EventLoopStrategy.js"
-import type { Message } from "../../messaging/Message.js"
-import type { CooperationScope } from "../CooperationScope.js"
 import type { SagaBuilder } from "./SagaBuilder.js"
 
 /**
@@ -111,10 +111,7 @@ export class RunCount extends MappedElement {
 }
 
 /** Context key for tracking execution count in periodic tasks. */
-export const RunCountKey = new MappedKey<RunCount>(
-    "RunCountKey",
-    json => new RunCount(json.value),
-)
+export const RunCountKey = new MappedKey<RunCount>("RunCountKey", json => new RunCount(json.value))
 
 /**
  * Turns the current saga into a periodic task: sleep for [runEveryMillis], then (if the run

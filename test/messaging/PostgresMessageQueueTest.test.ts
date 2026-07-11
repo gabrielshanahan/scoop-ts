@@ -1,8 +1,8 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../src/coroutine/builder/SagaBuilder.js"
-import { eventLoopStrategy } from "../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../src/coroutine/TransactionRunner.js"
+import { eventLoopStrategy } from "../../src/messaging/HandlerRegistry.js"
 import { ciSleep, eventLogSettled, setupScoopTest } from "../support/harness.js"
 import { CountDownLatch } from "../support/latch.js"
 
@@ -51,7 +51,9 @@ describe("PostgresMessageQueueTest", () => {
         try {
             for (let i = 1; i <= messageCount; i++) {
                 await transactional(h.sql, async connection => {
-                    await h.messageQueue.launch(connection, testTopic, { text: `Message ${i}` })
+                    await h.messageQueue.launch(connection, testTopic, {
+                        text: `Message ${i}`,
+                    })
                 })
             }
 
@@ -107,7 +109,8 @@ describe("PostgresMessageQueueTest", () => {
             assert.equal(successMessageIndex, 2)
             assert.equal(failedMessageIndex, 1)
 
-            const [row] = await h.sql`SELECT count(*)::int AS count FROM message WHERE topic = ${otherTopic}`
+            const [row] =
+                await h.sql`SELECT count(*)::int AS count FROM message WHERE topic = ${otherTopic}`
             assert.equal(
                 Number(row!.count),
                 1,
@@ -135,8 +138,7 @@ describe("PostgresMessageQueueTest", () => {
                 b.step({
                     invoke: async (scope, _message) => {
                         const identifier =
-                            scope.continuation.continuationIdentifier
-                                .distributedCoroutineIdentifier
+                            scope.continuation.continuationIdentifier.distributedCoroutineIdentifier
                         seenInstances.add(identifier.instance)
                         seenNames.add(identifier.name)
                         latch.countDown()
@@ -154,7 +156,9 @@ describe("PostgresMessageQueueTest", () => {
         try {
             for (let i = 1; i <= instanceCount; i++) {
                 await transactional(h.sql, async connection => {
-                    await h.messageQueue.launch(connection, testTopic, { text: `Message ${i}` })
+                    await h.messageQueue.launch(connection, testTopic, {
+                        text: `Message ${i}`,
+                    })
                 })
             }
 
@@ -180,9 +184,13 @@ describe("PostgresMessageQueueTest", () => {
     })
 
     test("subscribe rejects instances less than one", () => {
-        const testSaga = saga(testHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
-            b.step({ invoke: () => {} })
-        })
+        const testSaga = saga(
+            testHandler,
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
+            b => {
+                b.step({ invoke: () => {} })
+            },
+        )
 
         assert.throws(
             () => h.messageQueue.subscribe(testTopic, testSaga, 0),

@@ -74,10 +74,7 @@ describe("CooperationContextTest", () => {
             ),
             '{"TestKey":{"value":"different-test-value"}}',
         )
-        assert.equal(
-            writeContextJson(context.get(TestKey)!),
-            '{"TestKey":{"value":"test-value"}}',
-        )
+        assert.equal(writeContextJson(context.get(TestKey)!), '{"TestKey":{"value":"test-value"}}')
         assert.equal(
             writeContextJson(context.minus(unmappedKey)),
             '{"TestKey":{"value":"test-value"}}',

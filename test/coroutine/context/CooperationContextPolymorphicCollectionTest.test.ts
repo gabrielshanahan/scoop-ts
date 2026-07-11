@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import {
-    CooperationContext,
+    type CooperationContext,
     MappedElement,
     MappedKey,
 } from "../../../src/coroutine/context/CooperationContext.js"
@@ -15,9 +15,7 @@ import {
  * Animal hierarchy; the TS analog carries the same `type` discriminator explicitly in the data
  * and revives via it (see DECISIONS.md).
  */
-type Animal =
-    | { type: "Dog"; name: string }
-    | { type: "Cat"; name: string; livesLeft: number }
+type Animal = { type: "Dog"; name: string } | { type: "Cat"; name: string; livesLeft: number }
 
 function dog(name: string): Animal {
     return { type: "Dog", name }

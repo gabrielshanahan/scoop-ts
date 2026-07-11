@@ -1,7 +1,7 @@
+import { isoFromNowMillis, postgresMaxTime } from "../../../util/Clock.js"
 import { CancellationToken } from "../../context/CancellationToken.js"
 import { MappedKey } from "../../context/CooperationContext.js"
-import { isoFromNowMillis, postgresMaxTime } from "../../../util/Clock.js"
-import { combineDeadlines, DeadlineData } from "./Deadline.js"
+import { combineDeadlines, type DeadlineData } from "./Deadline.js"
 
 /**
  * Deadline that applies only to rollback (compensating action) execution — it does NOT apply

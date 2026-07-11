@@ -3,9 +3,9 @@ import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { MappedElement, MappedKey } from "../../../src/coroutine/context/CooperationContext.js"
 import { writeContextJson } from "../../../src/coroutine/context/CooperationContextModule.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
+import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
+import { eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 
 const h = setupScoopTest()

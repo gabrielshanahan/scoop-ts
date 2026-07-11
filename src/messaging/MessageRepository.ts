@@ -1,7 +1,7 @@
+import { asScoopInfrastructure } from "../coroutine/ScoopInfrastructureException.js"
 import type { JsonbHelper, JsonValue } from "../JsonbHelper.js"
 import { logger } from "../logging.js"
-import { DbConnection, queryNamed } from "../sql.js"
-import { asScoopInfrastructure } from "../coroutine/ScoopInfrastructureException.js"
+import { type DbConnection, queryNamed } from "../sql.js"
 import type { Message } from "./Message.js"
 
 const log = logger("MessageRepository")

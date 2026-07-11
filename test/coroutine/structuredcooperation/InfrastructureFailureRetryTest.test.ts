@@ -2,8 +2,8 @@ import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { ScoopInfrastructureException } from "../../../src/coroutine/ScoopInfrastructureException.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
+import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import { getEventSequence } from "../../support/util.js"
@@ -51,7 +51,9 @@ describe("InfrastructureFailureRetryTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(
@@ -99,7 +101,9 @@ describe("InfrastructureFailureRetryTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             const deadline = Date.now() + 15_000

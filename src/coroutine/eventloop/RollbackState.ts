@@ -1,4 +1,4 @@
-import { CooperationException } from "../structuredcooperation/CooperationFailure.js"
+import type { CooperationException } from "../structuredcooperation/CooperationFailure.js"
 import { ChildRollbackFailedException, ChildRolledBackException } from "./exceptions.js"
 
 /**

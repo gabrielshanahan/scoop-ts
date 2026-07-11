@@ -1,8 +1,8 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../src/coroutine/builder/SagaBuilder.js"
-import { eventLoopStrategy } from "../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../src/coroutine/TransactionRunner.js"
+import { eventLoopStrategy } from "../../src/messaging/HandlerRegistry.js"
 import { setupScoopTest } from "../support/harness.js"
 import { CountDownLatch } from "../support/latch.js"
 

@@ -1,11 +1,16 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
+import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
-import { getEventSequence, keepOnlyHandlers, keepOnlyPrefixedBy, triple } from "../../support/util.js"
+import {
+    getEventSequence,
+    keepOnlyHandlers,
+    keepOnlyPrefixedBy,
+    triple,
+} from "../../support/util.js"
 
 const h = setupScoopTest()
 
@@ -55,7 +60,9 @@ describe("HappyPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -161,7 +168,9 @@ describe("HappyPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
@@ -275,7 +284,9 @@ describe("HappyPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
@@ -307,11 +318,7 @@ describe("HappyPathTest", () => {
             )
 
             assert.deepEqual(
-                keepOnlyHandlers(
-                    await getEventSequence(h.sql),
-                    "root-handler",
-                    "child-handler-1",
-                ),
+                keepOnlyHandlers(await getEventSequence(h.sql), "root-handler", "child-handler-1"),
                 [
                     triple("EMITTED", null, null),
                     triple("SEEN", null, "root-handler"),
@@ -328,11 +335,7 @@ describe("HappyPathTest", () => {
             )
 
             assert.deepEqual(
-                keepOnlyHandlers(
-                    await getEventSequence(h.sql),
-                    "root-handler",
-                    "child-handler-2",
-                ),
+                keepOnlyHandlers(await getEventSequence(h.sql), "root-handler", "child-handler-2"),
                 [
                     triple("EMITTED", null, null),
                     triple("SEEN", null, "root-handler"),
@@ -418,7 +421,9 @@ describe("HappyPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "All handlers should complete")
@@ -450,11 +455,7 @@ describe("HappyPathTest", () => {
             )
 
             assert.deepEqual(
-                keepOnlyHandlers(
-                    await getEventSequence(h.sql),
-                    "root-handler",
-                    "child-handler-1",
-                ),
+                keepOnlyHandlers(await getEventSequence(h.sql), "root-handler", "child-handler-1"),
                 [
                     triple("EMITTED", null, null),
                     triple("SEEN", null, "root-handler"),
@@ -470,11 +471,7 @@ describe("HappyPathTest", () => {
             )
 
             assert.deepEqual(
-                keepOnlyHandlers(
-                    await getEventSequence(h.sql),
-                    "root-handler",
-                    "child-handler-2",
-                ),
+                keepOnlyHandlers(await getEventSequence(h.sql), "root-handler", "child-handler-2"),
                 [
                     triple("EMITTED", null, null),
                     triple("SEEN", null, "root-handler"),

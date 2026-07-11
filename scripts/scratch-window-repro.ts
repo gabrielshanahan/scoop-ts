@@ -4,11 +4,12 @@
  * timestamps, then runs the emitted_record window with the suspendedAt value each candidate
  * code path would pass, printing which values match the EMITTED row.
  */
+
+import { randomUUID } from "node:crypto"
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
 import { PostgreSqlContainer } from "@testcontainers/postgresql"
 import postgres from "postgres"
-import { fileURLToPath } from "node:url"
-import { dirname, join } from "node:path"
-import { randomUUID } from "node:crypto"
 import { applyMigrations } from "../src/node/migrations.js"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
@@ -31,7 +32,12 @@ const rows: Array<[string, string, string | null, string]> = [
     [childMsg, "SUSPENDED", "2", "2026-07-11 03:50:53.075418+00"],
     [childMsg, "COMMITTED", "2", "2026-07-11 03:50:53.084481+00"],
     [childMsg, "ROLLING_BACK", null, "2026-07-11 03:50:53.212294+00"],
-    [childMsg, "SUSPENDED", "Rollback of 2[0,] (rolling back child scopes)", "2026-07-11 03:50:53.221788+00"],
+    [
+        childMsg,
+        "SUSPENDED",
+        "Rollback of 2[0,] (rolling back child scopes)",
+        "2026-07-11 03:50:53.221788+00",
+    ],
     [childMsg, "SUSPENDED", "Rollback of 2[0,]", "2026-07-11 03:50:53.229452+00"],
 ]
 for (const [messageId, type, step, createdAt] of rows) {
@@ -100,7 +106,8 @@ for (const inst of agg!.instances) {
     }
 }
 // The stored values as text (proves whether the inserts kept microseconds):
-const stored = await sql`SELECT step, created_at::text FROM message_event WHERE cooperation_lineage = ${lin}::uuid[] AND type = 'SUSPENDED' ORDER BY created_at`
+const stored =
+    await sql`SELECT step, created_at::text FROM message_event WHERE cooperation_lineage = ${lin}::uuid[] AND type = 'SUSPENDED' ORDER BY created_at`
 for (const row of stored) console.log("stored:", row.step, row.created_at)
 // The fix: bind the full-precision string via ::text::timestamptz
 console.log(

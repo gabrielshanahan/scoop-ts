@@ -1,5 +1,5 @@
 import { ScoopException } from "../ScoopException.js"
-import { CooperationException } from "../structuredcooperation/CooperationFailure.js"
+import type { CooperationException } from "../structuredcooperation/CooperationFailure.js"
 
 /**
  * Used when one or more child handlers fail during structured cooperation. The first failure

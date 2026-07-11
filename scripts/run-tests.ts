@@ -8,11 +8,12 @@
  *   npm test -- --shuffle[=seed]   # randomized file order (prints the seed for reproduction)
  *   npm test -- test/coroutine/... # specific files
  */
-import { PostgreSqlContainer } from "@testcontainers/postgresql"
+
 import { spawn } from "node:child_process"
 import { readdirSync, statSync } from "node:fs"
-import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
+import { PostgreSqlContainer } from "@testcontainers/postgresql"
 import postgres from "postgres"
 import { applyMigrations } from "../src/node/migrations.js"
 
@@ -35,11 +36,12 @@ const args = process.argv.slice(2)
 const shuffleArg = args.find(a => a.startsWith("--shuffle"))
 const fileArgs = args.filter(a => !a.startsWith("--"))
 
-let files = fileArgs.length > 0 ? fileArgs : collectTestFiles(join(root, "test"))
+const files = fileArgs.length > 0 ? fileArgs : collectTestFiles(join(root, "test"))
 
 if (shuffleArg) {
-    const seed =
-        shuffleArg.includes("=") ? Number(shuffleArg.split("=")[1]) : Math.floor(Math.random() * 2 ** 31)
+    const seed = shuffleArg.includes("=")
+        ? Number(shuffleArg.split("=")[1])
+        : Math.floor(Math.random() * 2 ** 31)
     console.log(`shuffling test files with seed ${seed} (reproduce with --shuffle=${seed})`)
     // Deterministic LCG-based Fisher-Yates
     let state = seed >>> 0

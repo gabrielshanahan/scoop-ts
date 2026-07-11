@@ -1,4 +1,4 @@
-import { CooperationContext, has, MappedElement, MappedKey } from "./CooperationContext.js"
+import { type CooperationContext, has, MappedElement } from "./CooperationContext.js"
 
 /**
  * Base class for context elements that can cause saga cancellation (deadlines being the common
@@ -11,10 +11,6 @@ import { CooperationContext, has, MappedElement, MappedKey } from "./Cooperation
 export abstract class CancellationToken<
     SELF extends CancellationToken<SELF>,
 > extends MappedElement {
-    constructor(key: MappedKey<any>) {
-        super(key)
-    }
-
     override plus(context: CooperationContext): CooperationContext {
         if (context instanceof CancellationToken && has(context, this.key)) {
             return this.and(context as SELF)

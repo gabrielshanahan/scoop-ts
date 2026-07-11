@@ -1,16 +1,13 @@
+import { isoFromNowMillis, postgresMaxTime } from "../../../util/Clock.js"
 import { CancellationToken } from "../../context/CancellationToken.js"
 import { MappedKey } from "../../context/CooperationContext.js"
-import { isoFromNowMillis, postgresMaxTime } from "../../../util/Clock.js"
-import { combineDeadlines, DeadlineData } from "./Deadline.js"
+import { combineDeadlines, type DeadlineData } from "./Deadline.js"
 
 /**
  * Deadline that applies to the entire saga lifecycle regardless of execution phase — normal
  * execution and rollback alike.
  */
-export class AbsoluteDeadline
-    extends CancellationToken<AbsoluteDeadline>
-    implements DeadlineData
-{
+export class AbsoluteDeadline extends CancellationToken<AbsoluteDeadline> implements DeadlineData {
     constructor(
         readonly deadline: string,
         readonly source: string,

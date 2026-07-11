@@ -1,4 +1,4 @@
-import { CooperationContext } from "./coroutine/context/CooperationContext.js"
+import type { CooperationContext } from "./coroutine/context/CooperationContext.js"
 import {
     contextFromParsedJson,
     writeContextJson,

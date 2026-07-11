@@ -2,13 +2,13 @@ import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../../../src/coroutine/builder/SagaBuilder.js"
 import {
+    type HappyPathDeadline,
     happyPathTimeout,
-    HappyPathDeadline,
     noHappyPathTimeout,
 } from "../../../../src/coroutine/eventloop/deadline/HappyPathDeadline.js"
-import { eventLoopStrategy } from "../../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, eventLogSettled, setupScoopTest } from "../../../support/harness.js"
+import { eventLoopStrategy } from "../../../../src/messaging/HandlerRegistry.js"
+import { eventLogSettled, setupScoopTest } from "../../../support/harness.js"
 import { CountDownLatch } from "../../../support/latch.js"
 import {
     asSource,
@@ -26,17 +26,21 @@ describe("DeadlineTest", () => {
         let childStarted = false
         let deadline: HappyPathDeadline | null = null
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
-            b.step({
-                invoke: async (scope, _message) => {
-                    deadline = happyPathTimeout(0, "root handler")
-                    await scope.launch(h.childTopic, { from: "root-handler" }, deadline)
-                },
-                rollback: (_scope, _message, _throwable) => {
-                    latch.countDown()
-                },
-            })
-        })
+        const rootHandlerCoroutine = saga(
+            "root-handler",
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
+            b => {
+                b.step({
+                    invoke: async (scope, _message) => {
+                        deadline = happyPathTimeout(0, "root handler")
+                        await scope.launch(h.childTopic, { from: "root-handler" }, deadline)
+                    },
+                    rollback: (_scope, _message, _throwable) => {
+                        latch.countDown()
+                    },
+                })
+            },
+        )
         const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         const childHandlerCoroutine = saga(
@@ -79,8 +83,16 @@ describe("DeadlineTest", () => {
                 triple("ROLLING_BACK", "0", "child-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler"),
                 triple("ROLLING_BACK", "0", "root-handler"),
-                triple("ROLLBACK_EMITTED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
-                triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "ROLLBACK_EMITTED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "root-handler"),
             ])

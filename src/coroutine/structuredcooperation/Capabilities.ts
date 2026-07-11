@@ -1,15 +1,15 @@
 import type { JsonValue } from "../../JsonbHelper.js"
 import { logger } from "../../logging.js"
-import type { DbConnection } from "../../sql.js"
 import type { Message } from "../../messaging/Message.js"
 import type { MessageRepository } from "../../messaging/MessageRepository.js"
+import type { DbConnection } from "../../sql.js"
 import { uuidV7 } from "../../util/UuidV7.js"
-import { CooperationContext, emptyContext } from "../context/CooperationContext.js"
 import type { CooperationScope } from "../CooperationScope.js"
 import {
-    CooperationScopeIdentifier,
+    type CooperationScopeIdentifier,
     RootScopeIdentifier,
 } from "../CooperationScopeIdentifier.js"
+import { type CooperationContext, emptyContext } from "../context/CooperationContext.js"
 import { renderAsString } from "../DistributedCoroutineIdentifier.js"
 import type { Handler } from "../Handler.js"
 import type { VariableName } from "../VariableName.js"
@@ -163,11 +163,7 @@ export class Capabilities implements ScopeCapabilities, StructuredCooperationCap
             },
             "Launching scoped message",
         )
-        const message = await this.messageRepository.insertMessage(
-            scope.connection,
-            topic,
-            payload,
-        )
+        const message = await this.messageRepository.insertMessage(scope.connection, topic, payload)
 
         await this.messageEventRepository.insertScopedEmittedEvent(
             scope.connection,

@@ -1,12 +1,12 @@
 import type { JsonbHelper, JsonValue } from "../../JsonbHelper.js"
 import { logger } from "../../logging.js"
-import { DbConnection, queryNamed, uuidArrayLiteral } from "../../sql.js"
-import { CooperationContext, isNotEmpty } from "../context/CooperationContext.js"
-import { asScoopInfrastructure } from "../ScoopInfrastructureException.js"
+import { type DbConnection, queryNamed, uuidArrayLiteral } from "../../sql.js"
+import { type CooperationContext, isNotEmpty } from "../context/CooperationContext.js"
 import type { EventLoopStrategy } from "../eventloop/strategy/EventLoopStrategy.js"
+import { asScoopInfrastructure } from "../ScoopInfrastructureException.js"
 import {
-    CooperationException,
-    CooperationFailure,
+    type CooperationException,
+    type CooperationFailure,
     toCooperationException,
 } from "./CooperationFailure.js"
 import { buildSql, finalSelect } from "./PendingCoroutineRunSql.js"
@@ -72,10 +72,7 @@ export class MessageEventRepository {
         context: CooperationContext | null,
     ): Promise<void> {
         await asScoopInfrastructure(async () => {
-            log.debug(
-                { messageId, coroutineName, stepName },
-                "Inserting scoped EMITTED event",
-            )
+            log.debug({ messageId, coroutineName, stepName }, "Inserting scoped EMITTED event")
             await queryNamed(
                 connection,
                 `INSERT INTO message_event (message_id, type, coroutine_name, coroutine_identifier, step, cooperation_lineage, context, created_at)
@@ -310,7 +307,9 @@ export class MessageEventRepository {
                 .map(row => row.exception)
                 .filter(exception => exception !== null && exception !== undefined)
                 .map(exception =>
-                    toCooperationException(this.jsonbHelper.fromJsonb<CooperationFailure>(exception)),
+                    toCooperationException(
+                        this.jsonbHelper.fromJsonb<CooperationFailure>(exception),
+                    ),
                 )
         })
     }
@@ -497,11 +496,10 @@ export class MessageEventRepository {
             // Nothing to do -> we're done
             return null
         }
-        const rows = await queryNamed(
-            connection,
-            buildSql(finalSelect(eventLoopStrategy, true)),
-            { coroutine_name: coroutineName, message_id: firstResult },
-        )
+        const rows = await queryNamed(connection, buildSql(finalSelect(eventLoopStrategy, true)), {
+            coroutine_name: coroutineName,
+            message_id: firstResult,
+        })
         const row = rows[0]
         if (row === undefined) {
             // After the second fetch, the record is no longer ready for processing (i.e., the

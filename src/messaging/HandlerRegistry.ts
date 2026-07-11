@@ -1,5 +1,5 @@
-import { nowIso } from "../util/Clock.js"
 import { StandardEventLoopStrategy } from "../coroutine/eventloop/strategy/StandardEventLoopStrategy.js"
+import { nowIso } from "../util/Clock.js"
 
 /**
  * Solves (as a placeholder) the "who is listening" problem: structured cooperation requires

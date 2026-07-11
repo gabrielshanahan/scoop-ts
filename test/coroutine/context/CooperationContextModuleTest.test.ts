@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import {
-    CooperationContext,
+    type CooperationContext,
     MappedElement,
     MappedKey,
     OpaqueElement,
@@ -303,6 +303,7 @@ describe("CooperationContextModuleTest", () => {
             assertRoundTrip(
                 new NumbersElement(
                     2147483647,
+                    // biome-ignore lint/correctness/noPrecisionLoss: Long.MAX_VALUE from the Kotlin test; how the codec round-trips it IS the subject
                     9223372036854775807,
                     1.7976931348623157e308,
                     3.4028235e38,
@@ -312,6 +313,7 @@ describe("CooperationContextModuleTest", () => {
 
         test("min value numbers", () => {
             assertRoundTrip(
+                // biome-ignore lint/correctness/noPrecisionLoss: Long.MIN_VALUE from the Kotlin test; how the codec round-trips it IS the subject
                 new NumbersElement(-2147483648, -9223372036854775808, 4.9e-324, 1.4e-45),
             )
         })
@@ -396,9 +398,7 @@ describe("CooperationContextModuleTest", () => {
         })
 
         test("deeply nested with special chars", () => {
-            assertRoundTrip(
-                new DeepElement({ level2: { level3: { value: 'deep\t"value"\n' } } }),
-            )
+            assertRoundTrip(new DeepElement({ level2: { level3: { value: 'deep\t"value"\n' } } }))
         })
     })
 
@@ -511,7 +511,9 @@ describe("CooperationContextModuleTest", () => {
 
         test("complex nested structure survives double round-trip", () => {
             assertDoubleRoundTrip(
-                new DeepElement({ level2: { level3: { value: 'deep\t"value"\n\\path' } } }),
+                new DeepElement({
+                    level2: { level3: { value: 'deep\t"value"\n\\path' } },
+                }),
             )
         })
 

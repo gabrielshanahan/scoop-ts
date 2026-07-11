@@ -3,8 +3,8 @@ import type { CooperationScope } from "../CooperationScope.js"
 import {
     Continue,
     DistributedCoroutine,
-    NextStep,
-    TransactionalStep,
+    type NextStep,
+    type TransactionalStep,
 } from "../DistributedCoroutine.js"
 import { DistributedCoroutineIdentifier } from "../DistributedCoroutineIdentifier.js"
 import type { ChildFailureHandlerIteration } from "../eventloop/SuspensionState.js"
@@ -16,11 +16,7 @@ type MaybePromise<T> = T | Promise<T>
 export interface SimpleStepSpec {
     name?: string
     invoke: (scope: CooperationScope, message: Message) => MaybePromise<void>
-    rollback?: (
-        scope: CooperationScope,
-        message: Message,
-        throwable: Error,
-    ) => MaybePromise<void>
+    rollback?: (scope: CooperationScope, message: Message, throwable: Error) => MaybePromise<void>
     handleChildFailures?: (
         scope: CooperationScope,
         message: Message,

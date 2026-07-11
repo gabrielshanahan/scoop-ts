@@ -1,8 +1,8 @@
 import type { Sql } from "postgres"
-import type { JsonbHelper, JsonValue } from "../../src/JsonbHelper.js"
 import type { ContinuationIdentifier } from "../../src/coroutine/continuation/ContinuationIdentifier.js"
 import type { DistributedCoroutineIdentifier } from "../../src/coroutine/DistributedCoroutineIdentifier.js"
 import { cooperationFailureFromThrowable } from "../../src/coroutine/structuredcooperation/CooperationFailure.js"
+import type { JsonbHelper, JsonValue } from "../../src/JsonbHelper.js"
 import type { Message } from "../../src/messaging/Message.js"
 
 /**

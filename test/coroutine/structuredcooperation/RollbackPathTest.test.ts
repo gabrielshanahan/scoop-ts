@@ -1,14 +1,10 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
-import {
-    has,
-    MappedElement,
-    MappedKey,
-} from "../../../src/coroutine/context/CooperationContext.js"
 import type { CooperationScopeIdentifier } from "../../../src/coroutine/CooperationScopeIdentifier.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
+import { has, MappedElement, MappedKey } from "../../../src/coroutine/context/CooperationContext.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
+import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { ciSleep, eventLogSettled, setupScoopTest, waitUntil } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 import {
@@ -62,7 +58,9 @@ describe("RollbackPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000))
@@ -124,7 +122,9 @@ describe("RollbackPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(100_000), "Not everything completed correctly")
@@ -136,8 +136,16 @@ describe("RollbackPathTest", () => {
                 triple("EMITTED", "0", "root-handler"),
                 triple("SUSPENDED", "0", "root-handler"),
                 triple("ROLLING_BACK", "1", "root-handler"),
-                triple("ROLLBACK_EMITTED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
-                triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "ROLLBACK_EMITTED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "root-handler"),
             ])
@@ -216,7 +224,9 @@ describe("RollbackPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -230,12 +240,24 @@ describe("RollbackPathTest", () => {
                 triple("SEEN", null, "child-handler"),
                 triple("SUSPENDED", "0", "child-handler"),
                 triple("ROLLING_BACK", "1", "child-handler"),
-                triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "child-handler",
+                ),
                 triple("SUSPENDED", "Rollback of 0[0,]", "child-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler"),
                 triple("ROLLING_BACK", "0", "root-handler"),
-                triple("ROLLBACK_EMITTED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
-                triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "ROLLBACK_EMITTED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "root-handler"),
             ])
@@ -333,7 +355,9 @@ describe("RollbackPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -349,12 +373,28 @@ describe("RollbackPathTest", () => {
                 triple("SUSPENDED", "1", "child-handler"),
                 triple("COMMITTED", "1", "child-handler"),
                 triple("ROLLING_BACK", "1", "root-handler"),
-                triple("ROLLBACK_EMITTED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
-                triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                triple(
+                    "ROLLBACK_EMITTED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "root-handler",
+                ),
                 triple("ROLLING_BACK", null, "child-handler"),
-                triple("SUSPENDED", "Rollback of 1[0,] (rolling back child scopes)", "child-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of 1[0,] (rolling back child scopes)",
+                    "child-handler",
+                ),
                 triple("SUSPENDED", "Rollback of 1[0,]", "child-handler"),
-                triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler"),
+                triple(
+                    "SUSPENDED",
+                    "Rollback of 0[0,] (rolling back child scopes)",
+                    "child-handler",
+                ),
                 triple("SUSPENDED", "Rollback of 0[0,]", "child-handler"),
                 triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler"),
                 triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
@@ -383,34 +423,38 @@ describe("RollbackPathTest", () => {
         // rollbacks - 1 child2_step2_rollback + 1 root handleChildFailures
         const latch = new CountDownLatch(18)
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
-            b.step({
-                invoke: (_scope, _message) => {
-                    latch.countDown()
-                    executionOrder.push("root-handler-step-1")
-                },
-                rollback: (_scope, _message, _throwable) => {
-                    executionOrder.push("root-handler-rollback-step-1")
-                    latch.countDown()
-                },
-            })
-            b.step({
-                invoke: async (scope, _message) => {
-                    await scope.launch(h.childTopic, { from: "root-handler" })
-                    latch.countDown()
-                    executionOrder.push("root-handler-step-2")
-                },
-                rollback: (_scope, _message, _throwable) => {
-                    executionOrder.push("root-handler-rollback-step-2")
-                    latch.countDown()
-                },
-                handleChildFailures: (_scope, _message, throwable) => {
-                    executionOrder.push("root-handler-handleChildFailures-step-2")
-                    latch.countDown()
-                    throw throwable
-                },
-            })
-        })
+        const rootHandlerCoroutine = saga(
+            "root-handler",
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
+            b => {
+                b.step({
+                    invoke: (_scope, _message) => {
+                        latch.countDown()
+                        executionOrder.push("root-handler-step-1")
+                    },
+                    rollback: (_scope, _message, _throwable) => {
+                        executionOrder.push("root-handler-rollback-step-1")
+                        latch.countDown()
+                    },
+                })
+                b.step({
+                    invoke: async (scope, _message) => {
+                        await scope.launch(h.childTopic, { from: "root-handler" })
+                        latch.countDown()
+                        executionOrder.push("root-handler-step-2")
+                    },
+                    rollback: (_scope, _message, _throwable) => {
+                        executionOrder.push("root-handler-rollback-step-2")
+                        latch.countDown()
+                    },
+                    handleChildFailures: (_scope, _message, throwable) => {
+                        executionOrder.push("root-handler-handleChildFailures-step-2")
+                        latch.countDown()
+                        throw throwable
+                    },
+                })
+            },
+        )
         const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
         const childHandler1Coroutine = saga(
@@ -508,7 +552,9 @@ describe("RollbackPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000))
@@ -582,25 +628,61 @@ describe("RollbackPathTest", () => {
                     triple("SUSPENDED", "2", "child-handler-1"),
                     triple("COMMITTED", "2", "child-handler-1"),
                     triple("ROLLING_BACK", "1", "root-handler"),
-                    triple("ROLLBACK_EMITTED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
-                    triple("SUSPENDED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
+                    triple(
+                        "ROLLBACK_EMITTED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
                     triple("ROLLING_BACK", null, "child-handler-1"),
-                    triple("SUSPENDED", "Rollback of 2[0,] (rolling back child scopes)", "child-handler-1"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 2[0,] (rolling back child scopes)",
+                        "child-handler-1",
+                    ),
                     triple("SUSPENDED", "Rollback of 2[0,]", "child-handler-1"),
-                    triple("ROLLBACK_EMITTED", "Rollback of 1[0,] (rolling back child scopes)", "child-handler-1"),
-                    triple("SUSPENDED", "Rollback of 1[0,] (rolling back child scopes)", "child-handler-1"),
+                    triple(
+                        "ROLLBACK_EMITTED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "child-handler-1",
+                    ),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "child-handler-1",
+                    ),
                     triple("ROLLING_BACK", null, "grandchild-handler"),
-                    triple("SUSPENDED", "Rollback of 1[0,] (rolling back child scopes)", "grandchild-handler"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "grandchild-handler",
+                    ),
                     triple("SUSPENDED", "Rollback of 1[0,]", "grandchild-handler"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "grandchild-handler"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "grandchild-handler",
+                    ),
                     triple("SUSPENDED", "Rollback of 0[0,]", "grandchild-handler"),
                     triple("ROLLED_BACK", "Rollback of 0[0,]", "grandchild-handler"),
                     triple("SUSPENDED", "Rollback of 1[0,]", "child-handler-1"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler-1"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "child-handler-1",
+                    ),
                     triple("SUSPENDED", "Rollback of 0[0,]", "child-handler-1"),
                     triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler-1"),
                     triple("SUSPENDED", "Rollback of 1[0,]", "root-handler"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
                     triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
                     triple("ROLLED_BACK", "Rollback of 0[0,]", "root-handler"),
                 ],
@@ -617,14 +699,30 @@ describe("RollbackPathTest", () => {
                     triple("SEEN", null, "child-handler-2"),
                     triple("SUSPENDED", "0", "child-handler-2"),
                     triple("ROLLING_BACK", "1", "child-handler-2"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler-2"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "child-handler-2",
+                    ),
                     triple("SUSPENDED", "Rollback of 0[0,]", "child-handler-2"),
                     triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler-2"),
                     triple("ROLLING_BACK", "1", "root-handler"),
-                    triple("ROLLBACK_EMITTED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
-                    triple("SUSPENDED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
+                    triple(
+                        "ROLLBACK_EMITTED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
                     triple("SUSPENDED", "Rollback of 1[0,]", "root-handler"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
                     triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
                     triple("ROLLED_BACK", "Rollback of 0[0,]", "root-handler"),
                 ],
@@ -829,29 +927,33 @@ describe("RollbackPathTest", () => {
 
         const latch = new CountDownLatch(16)
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
-            b.step({
-                invoke: (_scope, _message) => {
-                    latch.countDown()
-                    executionOrder.push("root-handler-step-1")
-                },
-            })
-            b.step({
-                invoke: async (scope, _message) => {
-                    await scope.launch(h.childTopic, { from: "root-handler" })
-                    latch.countDown()
-                    executionOrder.push("root-handler-step-2")
-                },
-                handleChildFailures: (_scope, _message, throwable) => {
-                    // This will be called twice - once for the "normal" exception that starts
-                    // the rollback process, and then for the additional exception that get's
-                    // thrown during the rollback process
-                    executionOrder.push("root-handler-handleChildFailures-step-2")
-                    latch.countDown()
-                    throw throwable
-                },
-            })
-        })
+        const rootHandlerCoroutine = saga(
+            "root-handler",
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
+            b => {
+                b.step({
+                    invoke: (_scope, _message) => {
+                        latch.countDown()
+                        executionOrder.push("root-handler-step-1")
+                    },
+                })
+                b.step({
+                    invoke: async (scope, _message) => {
+                        await scope.launch(h.childTopic, { from: "root-handler" })
+                        latch.countDown()
+                        executionOrder.push("root-handler-step-2")
+                    },
+                    handleChildFailures: (_scope, _message, throwable) => {
+                        // This will be called twice - once for the "normal" exception that starts
+                        // the rollback process, and then for the additional exception that get's
+                        // thrown during the rollback process
+                        executionOrder.push("root-handler-handleChildFailures-step-2")
+                        latch.countDown()
+                        throw throwable
+                    },
+                })
+            },
+        )
 
         const rootSubscription = await h.subscribe(h.rootTopic, rootHandlerCoroutine)
 
@@ -948,7 +1050,9 @@ describe("RollbackPathTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), `Latch has count ${latch.getCount()}`)
@@ -1019,20 +1123,56 @@ describe("RollbackPathTest", () => {
                     triple("SUSPENDED", "2", "child-handler-1"),
                     triple("COMMITTED", "2", "child-handler-1"),
                     triple("ROLLING_BACK", "1", "root-handler"),
-                    triple("ROLLBACK_EMITTED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
-                    triple("SUSPENDED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
+                    triple(
+                        "ROLLBACK_EMITTED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
                     triple("ROLLING_BACK", null, "child-handler-1"),
-                    triple("SUSPENDED", "Rollback of 2[0,] (rolling back child scopes)", "child-handler-1"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 2[0,] (rolling back child scopes)",
+                        "child-handler-1",
+                    ),
                     triple("SUSPENDED", "Rollback of 2[0,]", "child-handler-1"),
-                    triple("ROLLBACK_EMITTED", "Rollback of 1[0,] (rolling back child scopes)", "child-handler-1"),
-                    triple("SUSPENDED", "Rollback of 1[0,] (rolling back child scopes)", "child-handler-1"),
+                    triple(
+                        "ROLLBACK_EMITTED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "child-handler-1",
+                    ),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "child-handler-1",
+                    ),
                     triple("ROLLING_BACK", null, "grandchild-handler"),
-                    triple("SUSPENDED", "Rollback of 1[0,] (rolling back child scopes)", "grandchild-handler"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "grandchild-handler",
+                    ),
                     triple("SUSPENDED", "Rollback of 1[0,]", "grandchild-handler"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "grandchild-handler"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "grandchild-handler",
+                    ),
                     triple("ROLLBACK_FAILED", "Rollback of 0[0,]", "grandchild-handler"),
-                    triple("ROLLBACK_FAILED", "Rollback of 1[0,] (rolling back child scopes)", "child-handler-1"),
-                    triple("ROLLBACK_FAILED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
+                    triple(
+                        "ROLLBACK_FAILED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "child-handler-1",
+                    ),
+                    triple(
+                        "ROLLBACK_FAILED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
                 ],
             )
 
@@ -1047,13 +1187,29 @@ describe("RollbackPathTest", () => {
                     triple("SEEN", null, "child-handler-2"),
                     triple("SUSPENDED", "0", "child-handler-2"),
                     triple("ROLLING_BACK", "1", "child-handler-2"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler-2"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "child-handler-2",
+                    ),
                     triple("SUSPENDED", "Rollback of 0[0,]", "child-handler-2"),
                     triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler-2"),
                     triple("ROLLING_BACK", "1", "root-handler"),
-                    triple("ROLLBACK_EMITTED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
-                    triple("SUSPENDED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
-                    triple("ROLLBACK_FAILED", "Rollback of 1[0,] (rolling back child scopes)", "root-handler"),
+                    triple(
+                        "ROLLBACK_EMITTED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
+                    triple(
+                        "ROLLBACK_FAILED",
+                        "Rollback of 1[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
                 ],
             )
 
@@ -1457,7 +1613,9 @@ describe("RollbackPathTest", () => {
 
             try {
                 await transactional(h.sql, async connection => {
-                    await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                    await h.messageQueue.launch(connection, h.rootTopic, {
+                        initial: "true",
+                    })
                 })
 
                 assert.ok(await latch.await(10_000), "Not everything completed correctly")
@@ -1483,10 +1641,26 @@ describe("RollbackPathTest", () => {
                         triple("ROLLING_BACK", "0", "child-handler-1"),
                         triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler-1"),
                         triple("ROLLING_BACK", "0", "root-handler"),
-                        triple("ROLLBACK_EMITTED", "Rollback of 0[0,0] (rolling back child scopes)", "root-handler"),
-                        triple("SUSPENDED", "Rollback of 0[0,0] (rolling back child scopes)", "root-handler"),
-                        triple("ROLLBACK_EMITTED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
-                        triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                        triple(
+                            "ROLLBACK_EMITTED",
+                            "Rollback of 0[0,0] (rolling back child scopes)",
+                            "root-handler",
+                        ),
+                        triple(
+                            "SUSPENDED",
+                            "Rollback of 0[0,0] (rolling back child scopes)",
+                            "root-handler",
+                        ),
+                        triple(
+                            "ROLLBACK_EMITTED",
+                            "Rollback of 0[0,] (rolling back child scopes)",
+                            "root-handler",
+                        ),
+                        triple(
+                            "SUSPENDED",
+                            "Rollback of 0[0,] (rolling back child scopes)",
+                            "root-handler",
+                        ),
                         triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
                         triple("ROLLED_BACK", "Rollback of 0[0,]", "root-handler"),
                     ],
@@ -1512,16 +1686,40 @@ describe("RollbackPathTest", () => {
                         triple("SUSPENDED", "0", "child-handler-2"),
                         triple("COMMITTED", "0", "child-handler-2"),
                         triple("ROLLING_BACK", "0", "root-handler"),
-                        triple("ROLLBACK_EMITTED", "Rollback of 0[0,0] (rolling back child scopes)", "root-handler"),
-                        triple("SUSPENDED", "Rollback of 0[0,0] (rolling back child scopes)", "root-handler"),
+                        triple(
+                            "ROLLBACK_EMITTED",
+                            "Rollback of 0[0,0] (rolling back child scopes)",
+                            "root-handler",
+                        ),
+                        triple(
+                            "SUSPENDED",
+                            "Rollback of 0[0,0] (rolling back child scopes)",
+                            "root-handler",
+                        ),
                         triple("ROLLING_BACK", null, "child-handler-2"),
-                        triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler-2"),
+                        triple(
+                            "SUSPENDED",
+                            "Rollback of 0[0,] (rolling back child scopes)",
+                            "child-handler-2",
+                        ),
                         triple("SUSPENDED", "Rollback of 0[0,]", "child-handler-2"),
                         triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler-2"),
-                        triple("ROLLBACK_EMITTED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
-                        triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                        triple(
+                            "ROLLBACK_EMITTED",
+                            "Rollback of 0[0,] (rolling back child scopes)",
+                            "root-handler",
+                        ),
+                        triple(
+                            "SUSPENDED",
+                            "Rollback of 0[0,] (rolling back child scopes)",
+                            "root-handler",
+                        ),
                         triple("ROLLING_BACK", null, "child-handler-2"),
-                        triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler-2"),
+                        triple(
+                            "SUSPENDED",
+                            "Rollback of 0[0,] (rolling back child scopes)",
+                            "child-handler-2",
+                        ),
                         triple("SUSPENDED", "Rollback of 0[0,]", "child-handler-2"),
                         triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler-2"),
                         triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
@@ -1604,12 +1802,16 @@ describe("RollbackPathTest", () => {
                 // The rollback request is only honoured once nothing in the hierarchy is still
                 // running; the original's fixed 100ms settle races slow commits, so wait for the
                 // exact precondition (both sagas COMMITTED) instead (DECISIONS.md).
-                await waitUntil(async () => {
-                    const [row] = await h.sql`
+                await waitUntil(
+                    async () => {
+                        const [row] = await h.sql`
                         SELECT count(*)::int AS committed FROM message_event WHERE type = 'COMMITTED'
                     `
-                    return Number(row!.committed) >= 2
-                }, 10_000, "both sagas to commit")
+                        return Number(row!.committed) >= 2
+                    },
+                    10_000,
+                    "both sagas to commit",
+                )
 
                 await transactional(h.sql, async connection => {
                     await h.scoop.capabilities.rollback(
@@ -1620,10 +1822,7 @@ describe("RollbackPathTest", () => {
                     )
                 })
 
-                assert.ok(
-                    await rollbackLatch.await(10_000),
-                    "Not everything rolled back correctly",
-                )
+                assert.ok(await rollbackLatch.await(10_000), "Not everything rolled back correctly")
                 await eventLogSettled(h.sql)
 
                 assert.deepEqual(await getEventSequence(h.sql), [
@@ -1637,10 +1836,22 @@ describe("RollbackPathTest", () => {
                     triple("COMMITTED", "0", "root-handler"),
                     triple("ROLLBACK_EMITTED", null, null),
                     triple("ROLLING_BACK", null, "root-handler"),
-                    triple("ROLLBACK_EMITTED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "root-handler"),
+                    triple(
+                        "ROLLBACK_EMITTED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "root-handler",
+                    ),
                     triple("ROLLING_BACK", null, "child-handler"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "child-handler",
+                    ),
                     triple("SUSPENDED", "Rollback of 0[0,]", "child-handler"),
                     triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler"),
                     triple("SUSPENDED", "Rollback of 0[0,]", "root-handler"),
@@ -1686,19 +1897,25 @@ describe("RollbackPathTest", () => {
 
             try {
                 await transactional(h.sql, async connection => {
-                    await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                    await h.messageQueue.launch(connection, h.rootTopic, {
+                        initial: "true",
+                    })
                 })
 
                 assert.ok(await latch.await(10_000), "Not everything completed correctly")
                 // The rollback request is only honoured once nothing in the hierarchy is still
                 // running; the original's fixed 100ms settle races slow commits, so wait for the
                 // exact precondition (both sagas COMMITTED) instead (DECISIONS.md).
-                await waitUntil(async () => {
-                    const [row] = await h.sql`
+                await waitUntil(
+                    async () => {
+                        const [row] = await h.sql`
                         SELECT count(*)::int AS committed FROM message_event WHERE type = 'COMMITTED'
                     `
-                    return Number(row!.committed) >= 2
-                }, 10_000, "both sagas to commit")
+                        return Number(row!.committed) >= 2
+                    },
+                    10_000,
+                    "both sagas to commit",
+                )
 
                 await transactional(h.sql, async connection => {
                     await h.scoop.capabilities.rollback(
@@ -1709,10 +1926,7 @@ describe("RollbackPathTest", () => {
                     )
                 })
 
-                assert.ok(
-                    await rollbackLatch.await(10_000),
-                    "Not everything rolled back correctly",
-                )
+                assert.ok(await rollbackLatch.await(10_000), "Not everything rolled back correctly")
                 await eventLogSettled(h.sql)
 
                 assert.deepEqual(await getEventSequence(h.sql), [
@@ -1726,7 +1940,11 @@ describe("RollbackPathTest", () => {
                     triple("COMMITTED", "0", "root-handler"),
                     triple("ROLLBACK_EMITTED", null, null),
                     triple("ROLLING_BACK", null, "child-handler"),
-                    triple("SUSPENDED", "Rollback of 0[0,] (rolling back child scopes)", "child-handler"),
+                    triple(
+                        "SUSPENDED",
+                        "Rollback of 0[0,] (rolling back child scopes)",
+                        "child-handler",
+                    ),
                     triple("SUSPENDED", "Rollback of 0[0,]", "child-handler"),
                     triple("ROLLED_BACK", "Rollback of 0[0,]", "child-handler"),
                 ])
@@ -1774,7 +1992,9 @@ describe("RollbackPathTest", () => {
 
             try {
                 await transactional(h.sql, async connection => {
-                    await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                    await h.messageQueue.launch(connection, h.rootTopic, {
+                        initial: "true",
+                    })
                 })
 
                 assert.ok(

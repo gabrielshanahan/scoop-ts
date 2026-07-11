@@ -1,14 +1,14 @@
 import {
     _registerContextMapFactories,
-    CooperationContext,
+    type CooperationContext,
     Element,
-    Key,
+    has,
+    type Key,
     keyEquals,
     keySerializedValue,
-    MappedKey,
+    type MappedKey,
     OpaqueElement,
     UnmappedKey,
-    has,
 } from "./CooperationContext.js"
 
 /**

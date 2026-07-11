@@ -9,11 +9,12 @@
  * setupScoopTest — no DB, no timing), and at least SOAK_MIN_ITERATIONS (default 5) iterations
  * either way. Test inventory comes from PORT-LEDGER.md, so the soak provably covers all 195.
  */
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers/postgresql"
+
 import { spawnSync } from "node:child_process"
 import { readFileSync, writeFileSync } from "node:fs"
-import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
+import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql"
 import postgres from "postgres"
 import { applyMigrations } from "../src/node/migrations.js"
 
@@ -84,7 +85,10 @@ async function prepareDatabase(): Promise<void> {
 }
 
 async function containerAlive(): Promise<boolean> {
-    const sql = postgres(container.getConnectionUri(), { max: 1, connect_timeout: 10 })
+    const sql = postgres(container.getConnectionUri(), {
+        max: 1,
+        connect_timeout: 10,
+    })
     try {
         await sql`SELECT 1`
         return true

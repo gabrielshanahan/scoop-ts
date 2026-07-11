@@ -1,5 +1,5 @@
 import {
-    CooperationContext,
+    type CooperationContext,
     Element,
     elementBean,
     keySerializedValue,

@@ -1,12 +1,12 @@
 import { after, before, beforeEach } from "node:test"
-import postgres, { Sql } from "postgres"
-import { Scoop } from "../../src/Scoop.js"
-import { JsonbHelper } from "../../src/JsonbHelper.js"
+import postgres, { type Sql } from "postgres"
 import type { DistributedCoroutine } from "../../src/coroutine/DistributedCoroutine.js"
-import { PostgresMessageQueue } from "../../src/messaging/PostgresMessageQueue.js"
+import { JsonbHelper } from "../../src/JsonbHelper.js"
+import type { PostgresMessageQueue } from "../../src/messaging/PostgresMessageQueue.js"
 import type { Subscription } from "../../src/messaging/Subscription.js"
 import { calibrateClockToDatabase } from "../../src/node/calibrateClock.js"
 import { PostgresTopicNotifier } from "../../src/node/PostgresTopicNotifier.js"
+import { Scoop } from "../../src/Scoop.js"
 import { sleep } from "./latch.js"
 
 const CI_TIMEOUT_MULTIPLIER = Number(process.env.CI_TIMEOUT_MULTIPLIER ?? "1")
@@ -50,10 +50,7 @@ export async function waitUntil(
  * returns instead of throwing, so a genuinely wrong end-state still fails through the test's own
  * assertion with its informative diff. See DECISIONS.md.
  */
-export async function eventLogSettled(
-    sql: Sql,
-    timeoutMillis = 15_000,
-): Promise<void> {
+export async function eventLogSettled(sql: Sql, timeoutMillis = 15_000): Promise<void> {
     const deadline = Date.now() + timeoutMillis * CI_TIMEOUT_MULTIPLIER
     while (Date.now() < deadline) {
         // Event ids are UUIDv7, so max(id) per group is the latest event in wall-clock order.
@@ -157,7 +154,9 @@ export function setupScoopTest(options: { tickIntervalMillis?: number } = {}): S
     before(async () => {
         const url = process.env.DATABASE_URL
         if (!url) {
-            throw new Error("DATABASE_URL not set — run tests via `npm test` (scripts/run-tests.ts)")
+            throw new Error(
+                "DATABASE_URL not set — run tests via `npm test` (scripts/run-tests.ts)",
+            )
         }
         harness.sql = postgres(url, { max: 30 })
         // The engine's authoritative clock is Postgres; align the injected client clock with it

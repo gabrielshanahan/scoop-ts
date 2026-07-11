@@ -1,12 +1,12 @@
 import assert from "node:assert/strict"
 import type { Sql } from "postgres"
-import type { JsonbHelper } from "../../src/JsonbHelper.js"
 import type { DistributedCoroutineIdentifier } from "../../src/coroutine/DistributedCoroutineIdentifier.js"
 import {
-    CooperationException,
-    CooperationFailure,
+    type CooperationException,
+    type CooperationFailure,
     toCooperationException,
 } from "../../src/coroutine/structuredcooperation/CooperationFailure.js"
+import type { JsonbHelper } from "../../src/JsonbHelper.js"
 
 /** One event-sequence row: [type, step, coroutine_name] — the analog of the Kotlin Triple. */
 export type EventTriple = [string, string | null, string | null]

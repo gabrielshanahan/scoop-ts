@@ -14,11 +14,7 @@ export interface DeadlineData {
     readonly trace: DeadlineData[]
 }
 
-type Create<T extends DeadlineData> = (
-    deadline: string,
-    source: string,
-    trace: DeadlineData[],
-) => T
+type Create<T extends DeadlineData> = (deadline: string, source: string, trace: DeadlineData[]) => T
 
 /**
  * Trace entries are REAL deadline instances (constructed via [create]) so they serialize in the
@@ -29,7 +25,10 @@ function withoutTrace<T extends DeadlineData>(deadline: DeadlineData, create: Cr
     return create(deadline.deadline, deadline.source, [])
 }
 
-function asTrace<T extends DeadlineData>(deadline: DeadlineData, create: Create<T>): DeadlineData[] {
+function asTrace<T extends DeadlineData>(
+    deadline: DeadlineData,
+    create: Create<T>,
+): DeadlineData[] {
     return dedupe([withoutTrace(deadline, create), ...deadline.trace])
 }
 
@@ -56,11 +55,7 @@ function dedupe(items: DeadlineData[]): DeadlineData[] {
  * Combines two deadlines by choosing the earlier (more restrictive) one, preserving the source of
  * the earlier deadline and a complete trace of all contributing deadlines.
  */
-export function combineDeadlines<T extends DeadlineData>(
-    self: T,
-    other: T,
-    create: Create<T>,
-): T {
+export function combineDeadlines<T extends DeadlineData>(self: T, other: T, create: Create<T>): T {
     const selfEarlier = compareTimestamps(self.deadline, other.deadline) <= 0
     const earlier = selfEarlier ? self : other
     const later = selfEarlier ? other : self

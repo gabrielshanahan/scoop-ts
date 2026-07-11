@@ -1,10 +1,10 @@
 import assert from "node:assert/strict"
 import { describe, test } from "node:test"
 import {
-    CooperationException,
-    CooperationFailure,
+    type CooperationException,
+    type CooperationFailure,
     cooperationFailureFromThrowable,
-    StackTraceFrame,
+    type StackTraceFrame,
     toCooperationException,
 } from "../../../src/coroutine/structuredcooperation/CooperationFailure.js"
 
@@ -110,11 +110,7 @@ describe("CooperationFailureTest", () => {
             "test-system",
         )
 
-        const originalCooperationFailureJson = JSON.stringify(
-            originalCooperationFailure,
-            null,
-            2,
-        )
+        const originalCooperationFailureJson = JSON.stringify(originalCooperationFailure, null, 2)
         const deserializedCooperationFailure = JSON.parse(
             originalCooperationFailureJson,
         ) as CooperationFailure
@@ -128,23 +124,14 @@ describe("CooperationFailureTest", () => {
         assertThrowablesEquivalent(originalException, cooperationException)
         assert.deepEqual(mappedCooperationFailure, originalCooperationFailure)
 
-        assert.equal(
-            cooperationException.message,
-            "[test-system] RuntimeError: Test exception",
-        )
+        assert.equal(cooperationException.message, "[test-system] RuntimeError: Test exception")
 
         // The Kotlin original pins the exact pretty-printed JSON (with JVM/Quarkus frames and
         // line numbers stripped). Runtime frames here are environment paths, so the equivalent
         // assertion pins the serialized STRUCTURE: field set, nesting, and the deterministic
         // values (see PORT-LEDGER note).
         const parsed = JSON.parse(originalCooperationFailureJson) as CooperationFailure
-        assert.deepEqual(Object.keys(parsed), [
-            "message",
-            "type",
-            "source",
-            "stackTrace",
-            "causes",
-        ])
+        assert.deepEqual(Object.keys(parsed), ["message", "type", "source", "stackTrace", "causes"])
         assert.equal(parsed.message, "Test exception")
         assert.equal(parsed.type, "RuntimeError")
         assert.equal(parsed.source, "test-system")

@@ -39,8 +39,7 @@ function stackTraceFrames(error: Error): StackTraceFrame[] {
     const stack = error.stack ?? ""
     const frames: StackTraceFrame[] = []
     for (const line of stack.split("\n")) {
-        const match =
-            /^\s+at\s+(?:(.+?)\s+\()?(?:(.+?):(\d+):\d+|(native))\)?$/.exec(line) ?? null
+        const match = /^\s+at\s+(?:(.+?)\s+\()?(?:(.+?):(\d+):\d+|(native))\)?$/.exec(line) ?? null
         if (!match) {
             continue
         }

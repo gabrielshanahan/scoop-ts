@@ -1,6 +1,5 @@
 import type { JsonbHelper } from "../JsonbHelper.js"
 import type { ActionInput } from "./ActionInput.js"
-import type { ActionTopic } from "./ActionTopic.js"
 import type { CooperationScope } from "./CooperationScope.js"
 import { Handler } from "./Handler.js"
 
@@ -11,10 +10,6 @@ import { Handler } from "./Handler.js"
  * Type parameters: I = input payload type, O = output result type.
  */
 export abstract class Action<I, O> extends Handler<ActionInput<I>> {
-    constructor(handlerName: string, topic: ActionTopic<I>) {
-        super(handlerName, topic)
-    }
-
     /** JsonbHelper for serializing output to JSONB. Must be provided by subclasses. */
     protected abstract readonly jsonbHelper: JsonbHelper
 

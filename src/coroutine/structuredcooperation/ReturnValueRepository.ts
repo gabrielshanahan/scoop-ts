@@ -1,5 +1,5 @@
 import type { JsonbHelper, JsonValue } from "../../JsonbHelper.js"
-import { DbConnection, queryNamed, uuidArrayLiteral } from "../../sql.js"
+import { type DbConnection, queryNamed, uuidArrayLiteral } from "../../sql.js"
 import type { Handler } from "../Handler.js"
 import { asScoopInfrastructure } from "../ScoopInfrastructureException.js"
 import type { VariableName } from "../VariableName.js"

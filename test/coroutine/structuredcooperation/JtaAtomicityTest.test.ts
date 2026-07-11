@@ -3,9 +3,9 @@ import { randomUUID } from "node:crypto"
 import { beforeEach, describe, test } from "node:test"
 import type { TransactionSql } from "postgres"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
-import { ciSleep, eventLogSettled, setupScoopTest } from "../../support/harness.js"
+import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
+import { eventLogSettled, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
 
 const h = setupScoopTest()
@@ -73,7 +73,9 @@ describe("JtaAtomicityTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(
@@ -118,7 +120,9 @@ describe("JtaAtomicityTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "Step did not run")

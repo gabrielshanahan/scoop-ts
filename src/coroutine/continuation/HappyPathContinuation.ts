@@ -1,19 +1,13 @@
 import type { TransactionSql } from "postgres"
-import type { CooperationContext } from "../context/CooperationContext.js"
-import type { ChildScopeIdentifier } from "../CooperationScopeIdentifier.js"
 import type { DistributedCoroutine } from "../DistributedCoroutine.js"
 import type { CoroutineState } from "../EventLoop.js"
-import {
-    ChildFailureHandlerIteration,
-    NO_CHILD_FAILURE,
-} from "../eventloop/SuspensionState.js"
+import { NO_CHILD_FAILURE } from "../eventloop/SuspensionState.js"
 import type { ScopeCapabilities } from "../structuredcooperation/Capabilities.js"
 import {
     AfterLastStep,
     BaseCooperationContinuation,
     BeforeFirstStep,
     BetweenSteps,
-    SuspensionPoint,
 } from "./CooperationContinuation.js"
 
 /**
@@ -21,28 +15,6 @@ import {
  * [BaseCooperationContinuation]; only the give-up strategy is specialized.
  */
 export class HappyPathContinuation extends BaseCooperationContinuation {
-    constructor(
-        connection: TransactionSql,
-        context: CooperationContext,
-        scopeIdentifier: ChildScopeIdentifier,
-        suspensionPoint: SuspensionPoint,
-        distributedCoroutine: DistributedCoroutine,
-        scopeCapabilities: ScopeCapabilities,
-        stepIteration: number,
-        childFailureHandlerIteration: ChildFailureHandlerIteration,
-    ) {
-        super(
-            connection,
-            context,
-            scopeIdentifier,
-            suspensionPoint,
-            distributedCoroutine,
-            scopeCapabilities,
-            stepIteration,
-            childFailureHandlerIteration,
-        )
-    }
-
     giveUpStrategy(seen: string): string {
         return this.distributedCoroutine.eventLoopStrategy.giveUpOnHappyPath(seen)
     }

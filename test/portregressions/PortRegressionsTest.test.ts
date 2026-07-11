@@ -2,12 +2,13 @@ import assert from "node:assert/strict"
 import { randomUUID } from "node:crypto"
 import { describe, test } from "node:test"
 import { saga } from "../../src/coroutine/builder/SagaBuilder.js"
+import { rollbackPathTimeout } from "../../src/coroutine/eventloop/deadline/RollbackPathDeadline.js"
 import { MessageEventRepository } from "../../src/coroutine/structuredcooperation/MessageEventRepository.js"
 import { transactional } from "../../src/coroutine/TransactionRunner.js"
 import { eventLoopStrategy } from "../../src/messaging/HandlerRegistry.js"
+import type { Subscription } from "../../src/messaging/Subscription.js"
 import { PostgresTopicNotifier } from "../../src/node/PostgresTopicNotifier.js"
 import { Scoop } from "../../src/Scoop.js"
-import { rollbackPathTimeout } from "../../src/coroutine/eventloop/deadline/RollbackPathDeadline.js"
 import { nowMillis, setClock } from "../../src/util/Clock.js"
 import { setupScoopTest, waitUntil } from "../support/harness.js"
 import { CountDownLatch, sleep } from "../support/latch.js"
@@ -140,7 +141,7 @@ describe("PortRegressionsTest", () => {
             ignoreMessagesOlderThan: epoch,
         })
         const latch = new CountDownLatch(1)
-        let subscription
+        let subscription: Subscription | undefined
         try {
             await scoop.ready()
             subscription = scoop.messageQueue.subscribe(

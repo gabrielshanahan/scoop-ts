@@ -1,12 +1,12 @@
 import type { Sql } from "postgres"
-import { EventLoop } from "./coroutine/EventLoop.js"
+import { DEFAULT_RECONCILE_SAFETY_NET_MILLIS, EventLoop } from "./coroutine/EventLoop.js"
 import {
     Capabilities,
-    StructuredCooperationCapabilities,
+    type StructuredCooperationCapabilities,
 } from "./coroutine/structuredcooperation/Capabilities.js"
 import { MessageEventRepository } from "./coroutine/structuredcooperation/MessageEventRepository.js"
 import { ReturnValueRepository } from "./coroutine/structuredcooperation/ReturnValueRepository.js"
-import { PostgresTransactionRunner, TransactionRunner } from "./coroutine/TransactionRunner.js"
+import { PostgresTransactionRunner, type TransactionRunner } from "./coroutine/TransactionRunner.js"
 import { JsonbHelper } from "./JsonbHelper.js"
 import { logger } from "./logging.js"
 import { MessageRepository } from "./messaging/MessageRepository.js"
@@ -14,8 +14,7 @@ import {
     DEFAULT_TICK_INTERVAL_MILLIS,
     PostgresMessageQueue,
 } from "./messaging/PostgresMessageQueue.js"
-import { NoOpTopicNotifier, TopicNotifier } from "./messaging/TopicNotifier.js"
-import { DEFAULT_RECONCILE_SAFETY_NET_MILLIS } from "./coroutine/EventLoop.js"
+import { NoOpTopicNotifier, type TopicNotifier } from "./messaging/TopicNotifier.js"
 
 const log = logger("Scoop")
 

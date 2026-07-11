@@ -8,11 +8,12 @@
  *
  * Usage: FILE_SOAK_SECONDS=1800 npx tsx scripts/soak-file.ts test/coroutine/structuredcooperation/RollbackPathTest.test.ts
  */
-import { PostgreSqlContainer, StartedPostgreSqlContainer } from "@testcontainers/postgresql"
+
 import { spawnSync } from "node:child_process"
 import { writeFileSync } from "node:fs"
-import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
+import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql"
 import postgres from "postgres"
 import { applyMigrations } from "../src/node/migrations.js"
 
@@ -108,7 +109,8 @@ while (Date.now() < deadline) {
                        created_at::text, child_failure_handler_iteration, next_step
                 FROM message_event ORDER BY created_at, id
             `
-            const messages = await sql`SELECT id, topic, created_at::text FROM message ORDER BY created_at`
+            const messages =
+                await sql`SELECT id, topic, created_at::text FROM message ORDER BY created_at`
             await sql.end()
             dump =
                 "\n=== POST-MORTEM message table ===\n" +

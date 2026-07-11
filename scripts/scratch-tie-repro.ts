@@ -9,27 +9,28 @@
  * returns the same microsecond for both inserts, the emission vanishes from the CTE and the
  * parent becomes (wrongly) ready.
  */
+
+import { randomUUID } from "node:crypto"
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
 import { PostgreSqlContainer } from "@testcontainers/postgresql"
 import postgres from "postgres"
-import { fileURLToPath } from "node:url"
-import { dirname, join } from "node:path"
-import { randomUUID } from "node:crypto"
-import { applyMigrations } from "../src/node/migrations.js"
-import { JsonbHelper } from "../src/JsonbHelper.js"
-import { SqlTestUtils } from "../test/support/SqlTestUtils.js"
-import { DistributedCoroutineIdentifier } from "../src/coroutine/DistributedCoroutineIdentifier.js"
-import { NO_CHILD_FAILURE } from "../src/coroutine/eventloop/SuspensionState.js"
-import { StandardEventLoopStrategy } from "../src/coroutine/eventloop/strategy/StandardEventLoopStrategy.js"
 import {
     ROLLING_BACK_CHILD_SCOPES_STEP_SUFFIX,
     ROLLING_BACK_PREFIX,
 } from "../src/coroutine/continuation/RollbackPathContinuation.js"
+import { DistributedCoroutineIdentifier } from "../src/coroutine/DistributedCoroutineIdentifier.js"
+import { NO_CHILD_FAILURE } from "../src/coroutine/eventloop/SuspensionState.js"
+import { StandardEventLoopStrategy } from "../src/coroutine/eventloop/strategy/StandardEventLoopStrategy.js"
 import {
     buildSql,
     candidateSeensWaitingToBeProcessed,
 } from "../src/coroutine/structuredcooperation/PendingCoroutineRunSql.js"
+import { JsonbHelper } from "../src/JsonbHelper.js"
+import { applyMigrations } from "../src/node/migrations.js"
 import { queryNamed } from "../src/sql.js"
 import { nowIso } from "../src/util/Clock.js"
+import { SqlTestUtils } from "../test/support/SqlTestUtils.js"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 const container = await new PostgreSqlContainer("postgres:15").start()
@@ -68,11 +69,16 @@ const registryStrategy = new StandardEventLoopStrategy(
 const waiting = candidateSeensWaitingToBeProcessed(registryStrategy)
 
 async function ready(name: string): Promise<boolean> {
-    const rows = await queryNamed(sql, buildSql(waiting), { coroutine_name: name })
+    const rows = await queryNamed(sql, buildSql(waiting), {
+        coroutine_name: name,
+    })
     return rows.length > 0
 }
 
-async function buildScenario(): Promise<{ emittedId: string; suspendedId: string }> {
+async function buildScenario(): Promise<{
+    emittedId: string
+    suspendedId: string
+}> {
     await sql`TRUNCATE TABLE message_event, message, return_value CASCADE`
     const rootScope = [randomUUID()]
     const childScope = [...rootScope, randomUUID()]

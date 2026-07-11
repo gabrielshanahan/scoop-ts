@@ -4,8 +4,8 @@ import { describe, test } from "node:test"
 import { saga } from "../../../src/coroutine/builder/SagaBuilder.js"
 import { Repeat } from "../../../src/coroutine/DistributedCoroutine.js"
 import { StandardEventLoopStrategy } from "../../../src/coroutine/eventloop/strategy/StandardEventLoopStrategy.js"
-import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { transactional } from "../../../src/coroutine/TransactionRunner.js"
+import { eventLoopStrategy } from "../../../src/messaging/HandlerRegistry.js"
 import { nowIso } from "../../../src/util/Clock.js"
 import { ciSleep, setupScoopTest } from "../../support/harness.js"
 import { CountDownLatch } from "../../support/latch.js"
@@ -92,7 +92,9 @@ describe("StubHandlerBlockingTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await latch.await(10_000), "First iteration did not complete")
@@ -147,7 +149,9 @@ describe("StubHandlerBlockingTest", () => {
 
         try {
             await transactional(h.sql, async connection => {
-                await h.messageQueue.launch(connection, h.rootTopic, { initial: "true" })
+                await h.messageQueue.launch(connection, h.rootTopic, {
+                    initial: "true",
+                })
             })
 
             assert.ok(await firstIterLatch.await(10_000), "First iteration did not complete")
