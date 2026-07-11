@@ -1621,7 +1621,7 @@ describe("RollbackPathTest", () => {
                 })
 
                 assert.ok(
-                    await rollbackLatch.await(1_000),
+                    await rollbackLatch.await(10_000),
                     "Not everything rolled back correctly",
                 )
                 await eventLogSettled(h.sql)
@@ -1710,7 +1710,7 @@ describe("RollbackPathTest", () => {
                 })
 
                 assert.ok(
-                    await rollbackLatch.await(1_000),
+                    await rollbackLatch.await(10_000),
                     "Not everything rolled back correctly",
                 )
                 await eventLogSettled(h.sql)
@@ -1778,7 +1778,7 @@ describe("RollbackPathTest", () => {
                 })
 
                 assert.ok(
-                    await secondRootStepExecuting.await(1_000),
+                    await secondRootStepExecuting.await(10_000),
                     "Second step didn't start executing",
                 )
 

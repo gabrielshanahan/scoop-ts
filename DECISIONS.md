@@ -154,6 +154,16 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   as fixed sleeps: workload sleeps inside step bodies, poll intervals inside explicit wait loops,
   `StubHandlerBlockingTest` (its sagas never terminate — the assertions are about *absence* of
   progress), and `PostgresMessageQueueTest`'s trailing post-assertion hygiene sleeps.
+- **Positive latch assertions all use the suite's standard 10s budget**: four sites (the
+  rollback-request latches and `secondRootStepExecuting` in `RollbackPathTest`, the multi-message
+  latch in `MessageEventsTest`) inherited `await(1s)` from the Kotlin original while every other
+  positive latch in the same tests uses 10s. A file-soak flake (iteration 269) caught the 1s one:
+  the debug trace shows the whole-hierarchy rollback making monotonic progress through every hop
+  (root plan → child rollback → root resume, all logged) but with 250–325ms per hop under soak
+  load instead of the nominal ~15ms, finishing ~140ms after the 1s deadline. Not an engine defect
+  — a scheduling-latency under-provision, present in the original too. Negative-assertion waits
+  (absence of progress) and the 5s single-hop NOTIFY-latency checks are deliberately unchanged;
+  the strict event-sequence assertions that follow each latch are the real correctness check.
 
 ## The scoop-quarkus main-file mapping (concrete)
 

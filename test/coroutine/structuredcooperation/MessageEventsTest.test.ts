@@ -355,7 +355,7 @@ describe("MessageEventsTest", () => {
             messages.push(message.id)
         }
 
-        assert.ok(await countDownLatch.await(1_000), "All messages should be processed")
+        assert.ok(await countDownLatch.await(10_000), "All messages should be processed")
         await eventLogSettled(h.sql)
 
         assert.equal(
