@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## Unreleased
 
+## v0.5.0 — 2026-07-11
+
 ### Fixed
 
 - **Rollback-path deadlines now actually fire.** The deadline element serialized under
