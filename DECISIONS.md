@@ -96,6 +96,21 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   runs `reconcileSafetyNetMillis: 2_000` so any residual missed wake (e.g. a listen-connection
   reconnect dropping a notification) is repaired well inside the latch windows. Production
   defaults are unchanged.
+- **`created_at` is strictly increasing per cooperation lineage** (engine INSERTs only; the
+  schema and readiness SQL stay verbatim): the step-window CTEs compare same-lineage events with
+  strict `<` on `created_at` (`emissions.created_at < latest_suspended.created_at` and the
+  intervening-SUSPENDED windows). The engine writes an emission and its SUSPENDED mark
+  back-to-back in one tick transaction; `CLOCK_TIMESTAMP()` has microsecond resolution, and a
+  microsecond tie makes the emission vanish from "emitted in latest step" — the parent then
+  resumes as if the step emitted nothing, skipping its children's rollbacks entirely (observed:
+  a grandchild's rollback lambdas never ran while every ancestor "completed all steps";
+  mechanically verified by hand-constructing the tied state and watching readiness flip —
+  scripts/scratch-tie-repro.ts). The bug is present in the Kotlin original (same SQL, same
+  default); it just needs a machine fast enough to execute two INSERTs in the same microsecond.
+  Remedy: every engine INSERT carrying a cooperation lineage sets
+  `created_at = GREATEST(CLOCK_TIMESTAMP(), max(created_at) over the lineage + 1 microsecond)`,
+  so same-lineage ties cannot be produced — real-time semantics are preserved except under a
+  tie, where the later event is nudged 1μs forward.
 - **Fixed sleeps that gate a mutation became condition polls**: three original tests wait
   `latch + Thread.sleep(100)` and then issue a cancel/rollback request that is only honoured
   "after everything has finished running". Under load the 100ms settle races the final commits

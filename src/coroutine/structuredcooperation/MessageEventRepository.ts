@@ -16,7 +16,17 @@ const log = logger("MessageEventRepository")
 /**
  * Repository for the `message_event` log — the append-only table that makes structured
  * cooperation possible. Ported 1:1 from the Kotlin original; SQL preserved verbatim (named
- * parameters are converted to positional at execution time).
+ * parameters are converted to positional at execution time), with one addition: every INSERT
+ * that writes a row carrying a cooperation lineage sets `created_at` to
+ * GREATEST(CLOCK_TIMESTAMP(), max(created_at of that lineage) + 1 microsecond) instead of
+ * relying on the column default. The step-window logic in PendingCoroutineRunSql compares
+ * same-lineage events with strict `<` on `created_at`; two inserts in one tick transaction
+ * (an emission followed by its SUSPENDED mark) can land in the same microsecond, which makes
+ * the emission vanish from the "emitted in latest step" CTEs and lets the parent resume
+ * without waiting for its children — a structured-cooperation invariant violation (present in
+ * the Kotlin original; reproduced and verified mechanically, see DECISIONS.md). Making
+ * `created_at` strictly increasing per lineage removes the tie at the source while keeping
+ * the readiness SQL verbatim.
  */
 export class MessageEventRepository {
     constructor(private readonly jsonbHelper: JsonbHelper) {}
@@ -40,8 +50,8 @@ export class MessageEventRepository {
             await queryNamed(
                 connection,
                 `--${messageId} || ${cooperationLineage.join(",")}
-                INSERT INTO message_event (message_id, type, cooperation_lineage, context)
-                VALUES (:messageId, 'EMITTED', :cooperationLineage::uuid[], :context::jsonb)`,
+                INSERT INTO message_event (message_id, type, cooperation_lineage, context, created_at)
+                VALUES (:messageId, 'EMITTED', :cooperationLineage::uuid[], :context::jsonb, GREATEST(CLOCK_TIMESTAMP(), COALESCE((SELECT max(created_at) FROM message_event WHERE cooperation_lineage = :cooperationLineage::uuid[]) + INTERVAL '1 microsecond', CLOCK_TIMESTAMP())))`,
                 {
                     messageId,
                     cooperationLineage: uuidArrayLiteral(cooperationLineage),
@@ -68,8 +78,8 @@ export class MessageEventRepository {
             )
             await queryNamed(
                 connection,
-                `INSERT INTO message_event (message_id, type, coroutine_name, coroutine_identifier, step, cooperation_lineage, context)
-                VALUES (:messageId, 'EMITTED', :coroutineName, :coroutineIdentifier, :stepName, :cooperationLineage::uuid[], :context::jsonb)`,
+                `INSERT INTO message_event (message_id, type, coroutine_name, coroutine_identifier, step, cooperation_lineage, context, created_at)
+                VALUES (:messageId, 'EMITTED', :coroutineName, :coroutineIdentifier, :stepName, :cooperationLineage::uuid[], :context::jsonb, GREATEST(CLOCK_TIMESTAMP(), COALESCE((SELECT max(created_at) FROM message_event WHERE cooperation_lineage = :cooperationLineage::uuid[]) + INTERVAL '1 microsecond', CLOCK_TIMESTAMP())))`,
                 {
                     messageId,
                     coroutineName,
@@ -107,10 +117,11 @@ export class MessageEventRepository {
                     message_id,
                     type,
                     cooperation_lineage,
-                    exception
+                    exception,
+                    created_at
                 )
                 SELECT
-                    message_id_lookup.message_id, 'ROLLBACK_EMITTED', :cooperationLineage::uuid[], :exception::jsonb
+                    message_id_lookup.message_id, 'ROLLBACK_EMITTED', :cooperationLineage::uuid[], :exception::jsonb, GREATEST(CLOCK_TIMESTAMP(), COALESCE((SELECT max(created_at) FROM message_event WHERE cooperation_lineage = :cooperationLineage::uuid[]) + INTERVAL '1 microsecond', CLOCK_TIMESTAMP()))
                 FROM message_id_lookup
                 WHERE NOT EXISTS (
                     -- Safety check: Only emit rollback if no part of the cooperation tree is actively running
@@ -164,14 +175,16 @@ export class MessageEventRepository {
                     type,
                     coroutine_name, coroutine_identifier, step,
                     cooperation_lineage,
-                    exception
+                    exception,
+                    created_at
                 )
                 SELECT
                     message_id_lookup.message_id,
                     'CANCELLATION_REQUESTED',
                     null, null, null,
                     :cooperationLineage::uuid[],
-                    :exception::jsonb
+                    :exception::jsonb,
+                    GREATEST(CLOCK_TIMESTAMP(), COALESCE((SELECT max(created_at) FROM message_event WHERE cooperation_lineage = :cooperationLineage::uuid[]) + INTERVAL '1 microsecond', CLOCK_TIMESTAMP()))
                 FROM message_id_lookup
                 ON CONFLICT (cooperation_lineage, type) WHERE type = 'CANCELLATION_REQUESTED' DO NOTHING`,
                 {
@@ -198,8 +211,8 @@ export class MessageEventRepository {
         await asScoopInfrastructure(async () => {
             await queryNamed(
                 connection,
-                `INSERT INTO message_event (message_id, type, coroutine_name, coroutine_identifier, step, cooperation_lineage, exception, context, child_failure_handler_iteration, next_step)
-                VALUES (:messageId, :messageEventType::message_event_type, :coroutineName, :coroutineIdentifier, :stepName, :cooperationLineage::uuid[], :exception::jsonb, :context::jsonb, :childFailureHandlerIteration, :nextStep)`,
+                `INSERT INTO message_event (message_id, type, coroutine_name, coroutine_identifier, step, cooperation_lineage, exception, context, child_failure_handler_iteration, next_step, created_at)
+                VALUES (:messageId, :messageEventType::message_event_type, :coroutineName, :coroutineIdentifier, :stepName, :cooperationLineage::uuid[], :exception::jsonb, :context::jsonb, :childFailureHandlerIteration, :nextStep, GREATEST(CLOCK_TIMESTAMP(), COALESCE((SELECT max(created_at) FROM message_event WHERE cooperation_lineage = :cooperationLineage::uuid[]) + INTERVAL '1 microsecond', CLOCK_TIMESTAMP())))`,
                 {
                     messageId,
                     messageEventType,
@@ -250,11 +263,11 @@ export class MessageEventRepository {
                 INSERT INTO message_event (
                     message_id, type,
                     cooperation_lineage, coroutine_name, coroutine_identifier, step,
-                    exception, context
+                    exception, context, created_at
                 )
                 SELECT
                     message_id, 'ROLLBACK_EMITTED',
-                    :cooperationLineage::uuid[], :coroutineName, :coroutineIdentifier, :scopeStepName, :exception::jsonb, :context::jsonb
+                    :cooperationLineage::uuid[], :coroutineName, :coroutineIdentifier, :scopeStepName, :exception::jsonb, :context::jsonb, GREATEST(CLOCK_TIMESTAMP(), COALESCE((SELECT max(created_at) FROM message_event WHERE cooperation_lineage = :cooperationLineage::uuid[]) + INTERVAL '1 microsecond', CLOCK_TIMESTAMP()))
                 FROM emitted_record`,
                 {
                     cooperationLineage: uuidArrayLiteral(cooperationLineage),
