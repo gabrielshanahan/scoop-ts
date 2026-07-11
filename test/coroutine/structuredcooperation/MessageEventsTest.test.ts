@@ -58,14 +58,14 @@ describe("MessageEventsTest", () => {
 
         const subscription1 = await h.subscribe(
             testTopic,
-            saga(handlerName1, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName1, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({ invoke: () => latch.countDown() })
             }),
         )
 
         const subscription2 = await h.subscribe(
             testTopic,
-            saga(handlerName2, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName2, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({ invoke: () => latch.countDown() })
             }),
         )
@@ -96,7 +96,7 @@ describe("MessageEventsTest", () => {
 
         const subscription1 = await h.subscribe(
             testTopic,
-            saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: () => {
                         processedCount++
@@ -108,7 +108,7 @@ describe("MessageEventsTest", () => {
 
         const subscription2 = await h.subscribe(
             testTopic,
-            saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: () => {
                         processedCount++
@@ -142,7 +142,7 @@ describe("MessageEventsTest", () => {
 
         const subscription = await h.subscribe(
             testTopic,
-            saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({ invoke: () => latch.countDown() })
             }),
         )
@@ -169,7 +169,7 @@ describe("MessageEventsTest", () => {
 
         const subscription = await h.subscribe(
             testTopic,
-            saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: () => {
                         latch.countDown()
@@ -205,7 +205,7 @@ describe("MessageEventsTest", () => {
 
         const subscription = await h.subscribe(
             testTopic,
-            saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({ invoke: () => latch.countDown() })
             }),
         )
@@ -257,7 +257,7 @@ describe("MessageEventsTest", () => {
 
         const subscription = await h.subscribe(
             testTopic,
-            saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: () => {
                         latch.countDown()
@@ -321,7 +321,7 @@ describe("MessageEventsTest", () => {
 
         const subscription1 = await h.subscribe(
             testTopic,
-            saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, message) => {
                         processedMessages.add(message.id)
@@ -333,7 +333,7 @@ describe("MessageEventsTest", () => {
 
         const subscription2 = await h.subscribe(
             testTopic,
-            saga(handlerName, eventLoopStrategy(h.messageQueue), b => {
+            saga(handlerName, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, message) => {
                         processedMessages.add(message.id)

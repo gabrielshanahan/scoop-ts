@@ -56,7 +56,7 @@ describe("ReturnValueTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { task: "compute" })
@@ -77,7 +77,7 @@ describe("ReturnValueTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("ChildHandler", eventLoopStrategy(h.messageQueue), b => {
+            saga("ChildHandler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.storeReturnValue(TestResult, { answer: 42 })
@@ -115,7 +115,7 @@ describe("ReturnValueTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { task: "a" })
@@ -137,7 +137,7 @@ describe("ReturnValueTest", () => {
 
         const childSubscription1 = await h.subscribe(
             h.childTopic,
-            saga("ChildHandler1", eventLoopStrategy(h.messageQueue), b => {
+            saga("ChildHandler1", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.storeReturnValue(TestResult, { result: "from-child-1" })
@@ -148,7 +148,7 @@ describe("ReturnValueTest", () => {
 
         const childSubscription2 = await h.subscribe(
             childTopic2,
-            saga("ChildHandler2", eventLoopStrategy(h.messageQueue), b => {
+            saga("ChildHandler2", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.storeReturnValue(TestResult, { result: "from-child-2" })
@@ -187,7 +187,7 @@ describe("ReturnValueTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { task: "compute" })
@@ -206,7 +206,7 @@ describe("ReturnValueTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("ChildHandler", eventLoopStrategy(h.messageQueue), b => {
+            saga("ChildHandler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.storeReturnValue(TestResult, { value: "found" })
@@ -239,7 +239,7 @@ describe("ReturnValueTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { task: "multi" })
@@ -261,7 +261,7 @@ describe("ReturnValueTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("ChildHandler", eventLoopStrategy(h.messageQueue), b => {
+            saga("ChildHandler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.storeReturnValue(TestResult, { type: "test" })

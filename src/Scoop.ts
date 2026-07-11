@@ -24,6 +24,11 @@ export interface ScoopOptions {
     topicNotifier?: TopicNotifier
     /** How often the event loop polls for ready sagas (default: 50ms). */
     tickIntervalMillis?: number
+    /**
+     * Cutoff for the internal sleep handler's "ignore hierarchies older than" (default: client
+     * clock at creation). Pass a database-clock timestamp to avoid clock-skew sensitivity.
+     */
+    ignoreMessagesOlderThan?: string
     /** Safety-net reconcile sweep interval (default: 30s). */
     reconcileSafetyNetMillis?: number
     /** Per-step transaction runner (default: postgres.js sql.begin). */
@@ -79,6 +84,7 @@ export class Scoop {
             eventLoop,
             options.tickIntervalMillis ?? DEFAULT_TICK_INTERVAL_MILLIS,
             options.reconcileSafetyNetMillis ?? DEFAULT_RECONCILE_SAFETY_NET_MILLIS,
+            options.ignoreMessagesOlderThan,
         )
 
         log.info("Scoop framework initialized")

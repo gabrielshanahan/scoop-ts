@@ -32,7 +32,7 @@ describe("InfrastructureFailureRetryTest", () => {
         const rootHandler = "root-handler"
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(rootHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         const attempt = ++attempts
@@ -87,7 +87,7 @@ describe("InfrastructureFailureRetryTest", () => {
         const rootHandler = "root-handler"
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(rootHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         attempts++

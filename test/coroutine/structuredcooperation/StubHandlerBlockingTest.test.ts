@@ -81,7 +81,7 @@ describe("StubHandlerBlockingTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("child-handler-done")

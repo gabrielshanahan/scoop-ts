@@ -17,7 +17,7 @@ describe("HappyPathTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { from: "root-handler" })
@@ -36,7 +36,7 @@ describe("HappyPathTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         await ciSleep(100)
@@ -98,7 +98,7 @@ describe("HappyPathTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { from: "root-handler" })
@@ -117,7 +117,7 @@ describe("HappyPathTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         latch.countDown()
@@ -142,7 +142,7 @@ describe("HappyPathTest", () => {
 
         const grandchildSubscription = await h.subscribe(
             h.grandchildTopic,
-            saga("grandchild-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("grandchild-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         await ciSleep(200)
@@ -217,7 +217,7 @@ describe("HappyPathTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         executionOrder.push("root-handler-step-1")
@@ -237,7 +237,7 @@ describe("HappyPathTest", () => {
 
         const childSubscription1 = await h.subscribe(
             h.childTopic,
-            saga("child-handler-1", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler-1", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         await ciSleep(100)
@@ -256,7 +256,7 @@ describe("HappyPathTest", () => {
 
         const childSubscription2 = await h.subscribe(
             childTopic2,
-            saga("child-handler-2", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler-2", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         executionOrder.push("child-handler-2-step-1")
@@ -361,7 +361,7 @@ describe("HappyPathTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         executionOrder.push("root-handler-step-1")
@@ -380,7 +380,7 @@ describe("HappyPathTest", () => {
 
         const childSubscription1 = await h.subscribe(
             h.childTopic,
-            saga("child-handler-1", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler-1", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         await ciSleep(100)
@@ -399,7 +399,7 @@ describe("HappyPathTest", () => {
 
         const childSubscription2 = await h.subscribe(
             h.childTopic,
-            saga("child-handler-2", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler-2", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         await ciSleep(300)

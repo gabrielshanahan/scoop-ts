@@ -19,7 +19,7 @@ describe("LoopTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "loop-step",
                     invoke: (_scope, _message, iteration) => {
@@ -72,7 +72,7 @@ describe("LoopTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "immediate-continue",
                     invoke: (_scope, _message, iteration) => {
@@ -124,7 +124,7 @@ describe("LoopTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "loop-step",
                     invoke: async (scope, _message, iteration) => {
@@ -145,7 +145,7 @@ describe("LoopTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         await ciSleep(50)
@@ -206,7 +206,7 @@ describe("LoopTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-with-children",
                     invoke: async (scope, _message, stepIteration) => {
@@ -243,7 +243,7 @@ describe("LoopTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("child-step")
@@ -309,7 +309,7 @@ describe("LoopTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "loop-step",
                     invoke: (_scope, _message, stepIteration) => {
@@ -377,7 +377,7 @@ describe("LoopTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "loop-step",
                     invoke: (_scope, _message, stepIteration) => {
@@ -435,7 +435,7 @@ describe("LoopTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "loop-step",
                     invoke: (_scope, _message, stepIteration) => {
@@ -528,7 +528,7 @@ describe("LoopTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "loop-A",
                     invoke: (_scope, _message, stepIteration) => {
@@ -617,7 +617,7 @@ describe("LoopTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-with-child",
                     invoke: async (scope, _message, _stepIteration) => {
@@ -658,7 +658,7 @@ describe("LoopTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("child-step")
@@ -673,7 +673,7 @@ describe("LoopTest", () => {
 
         const grandchildSubscription = await h.subscribe(
             h.grandchildTopic,
-            saga("grandchild-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("grandchild-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("grandchild-step-throws")

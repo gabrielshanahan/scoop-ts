@@ -40,7 +40,7 @@ describe("ContextPropagationTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         contextValues.push(writeContextJson(scope.context))
@@ -77,7 +77,7 @@ describe("ContextPropagationTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (scope, _message) => {
                         scope.context = scope.context.plus(

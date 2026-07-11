@@ -26,7 +26,7 @@ describe("DeadlineTest", () => {
         let childStarted = false
         let deadline: HappyPathDeadline | null = null
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
             b.step({
                 invoke: async (scope, _message) => {
                     deadline = happyPathTimeout(0, "root handler")
@@ -41,7 +41,7 @@ describe("DeadlineTest", () => {
 
         const childHandlerCoroutine = saga(
             "child-handler",
-            eventLoopStrategy(h.messageQueue),
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
             b => {
                 b.step({
                     invoke: async (_scope, _message) => {

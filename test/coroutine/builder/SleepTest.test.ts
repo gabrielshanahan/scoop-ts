@@ -17,7 +17,7 @@ describe("SleepTest", () => {
         let step1Time = 0
         let step3Time = 0
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
             b.step({
                 invoke: (_scope, _message) => {
                     step1Time = nowMillis()
@@ -64,7 +64,7 @@ describe("SleepTest", () => {
         let scheduledStepTime = ""
         const startAfter = isoFromNowMillis(500)
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
             scheduledStep(b, String(b.steps.length), startAfter, (_scope, _message) => {
                 scheduledStepTime = isoFromNowMillis(0)
                 latch.countDown()
@@ -105,7 +105,7 @@ describe("SleepTest", () => {
         const runEveryMillis = 400
         const times: number[] = []
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
             periodic(b, runEveryMillis, 3)
             b.step({
                 invoke: (_scope, _message) => {

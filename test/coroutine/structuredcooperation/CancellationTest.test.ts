@@ -23,7 +23,7 @@ describe("CancellationTest", () => {
         const childIsExecuting = new CountDownLatch(1)
         const cancellation = new CountDownLatch(1)
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
             b.step({
                 invoke: async (scope, _message) => {
                     await scope.launch(h.childTopic, { from: "root-handler" })
@@ -40,7 +40,7 @@ describe("CancellationTest", () => {
 
         const childHandlerCoroutine = saga(
             "child-handler",
-            eventLoopStrategy(h.messageQueue),
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
             b => {
                 b.step({
                     invoke: async (_scope, _message) => {
@@ -181,7 +181,7 @@ describe("CancellationTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { from: "root-handler" })
@@ -194,7 +194,7 @@ describe("CancellationTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         await ciSleep(100)

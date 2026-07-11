@@ -91,6 +91,15 @@ export class ScoopHarness {
     topicNotifier!: PostgresTopicNotifier
     readonly jsonbHelper = new JsonbHelper()
 
+    /**
+     * Database-clock timestamp captured at file setup — the skew-immune anchor for the sagas'
+     * "ignore hierarchies older than" cutoff. The strategy default (client clock at saga build)
+     * can land a few milliseconds AHEAD of the database clock (calibration error + VM drift);
+     * a message launched right after the saga is built is then "older than" the cutoff and
+     * ignored until nothing — its SEEN is simply never created (see DECISIONS.md).
+     */
+    strategyEpoch!: string
+
     readonly rootTopic = "root-topic"
     readonly childTopic = "child-topic"
     readonly grandchildTopic = "grandchild-topic"
@@ -157,6 +166,8 @@ export function setupScoopTest(options: { tickIntervalMillis?: number } = {}): S
         if (Math.abs(offset) > 50) {
             console.log(`[harness] db-host clock offset: ${Math.round(offset)}ms (calibrated)`)
         }
+        const [epochRow] = await harness.sql`SELECT clock_timestamp()::text AS db_now`
+        harness.strategyEpoch = epochRow!.db_now as string
         harness.topicNotifier = new PostgresTopicNotifier(harness.sql)
         harness.scoop = Scoop.create(harness.sql, {
             topicNotifier: harness.topicNotifier,
@@ -168,6 +179,7 @@ export function setupScoopTest(options: { tickIntervalMillis?: number } = {}): S
             // correctness — so tests run the sweep at 2s to keep worst-case recovery well
             // inside their latch windows (see DECISIONS.md).
             reconcileSafetyNetMillis: 2_000,
+            ignoreMessagesOlderThan: harness.strategyEpoch,
         })
         harness.messageQueue = harness.scoop.messageQueue
         await harness.scoop.ready()

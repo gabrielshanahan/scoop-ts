@@ -51,7 +51,7 @@ describe("JtaAtomicityTest", () => {
 
         const subscription = await h.subscribe(
             h.rootTopic,
-            saga("jta-commit-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("jta-commit-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         // A child launch ensures the step's connection (used by scope.launch)
@@ -66,7 +66,7 @@ describe("JtaAtomicityTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("jta-commit-child", eventLoopStrategy(h.messageQueue), b => {
+            saga("jta-commit-child", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({ invoke: () => {} })
             }),
         )
@@ -104,7 +104,7 @@ describe("JtaAtomicityTest", () => {
 
         const subscription = await h.subscribe(
             h.rootTopic,
-            saga("jta-rollback-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("jta-rollback-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await probeWriter.write(scope.connection, probeId)

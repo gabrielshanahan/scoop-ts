@@ -39,7 +39,7 @@ describe("PostgresMessageQueueTest", () => {
 
         const subscription = await h.subscribe(
             testTopic,
-            saga(testHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(testHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         receivedCount++
@@ -74,7 +74,7 @@ describe("PostgresMessageQueueTest", () => {
 
         const subscription = await h.subscribe(
             testTopic,
-            saga(testHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(testHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, message) => {
                         await h.messageQueue.launch(scope.connection, otherTopic, otherPayload)
@@ -131,7 +131,7 @@ describe("PostgresMessageQueueTest", () => {
 
         const subscription = await h.subscribe(
             testTopic,
-            saga(testHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(testHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         const identifier =
@@ -180,7 +180,7 @@ describe("PostgresMessageQueueTest", () => {
     })
 
     test("subscribe rejects instances less than one", () => {
-        const testSaga = saga(testHandler, eventLoopStrategy(h.messageQueue), b => {
+        const testSaga = saga(testHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
             b.step({ invoke: () => {} })
         })
 
@@ -201,7 +201,7 @@ describe("PostgresMessageQueueTest", () => {
 
         const subscription = await h.subscribe(
             testTopic,
-            saga(testHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(testHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({ invoke: () => {} })
             }),
             3,

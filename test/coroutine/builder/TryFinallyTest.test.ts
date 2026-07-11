@@ -18,7 +18,7 @@ describe("TryFinallyTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 tryFinallyStep(
                     b,
                     async (scope, _message) => {
@@ -41,7 +41,7 @@ describe("TryFinallyTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("child-handler")
@@ -52,7 +52,7 @@ describe("TryFinallyTest", () => {
 
         const finallySubscription = await h.subscribe(
             finallyTopic,
-            saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("finally-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("finally-handler")
@@ -89,7 +89,7 @@ describe("TryFinallyTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 tryFinallyStep(
                     b,
                     (_scope, _message) => {
@@ -107,7 +107,7 @@ describe("TryFinallyTest", () => {
 
         const finallySubscription = await h.subscribe(
             finallyTopic,
-            saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("finally-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("finally-handler")
@@ -143,7 +143,7 @@ describe("TryFinallyTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 tryFinallyStep(
                     b,
                     async (scope, _message) => {
@@ -165,7 +165,7 @@ describe("TryFinallyTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("child-handler")
@@ -177,7 +177,7 @@ describe("TryFinallyTest", () => {
 
         const finallySubscription = await h.subscribe(
             finallyTopic,
-            saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("finally-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("finally-handler")
@@ -215,7 +215,7 @@ describe("TryFinallyTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("root-start")
@@ -246,7 +246,7 @@ describe("TryFinallyTest", () => {
 
         const finallySubscription = await h.subscribe(
             finallyTopic,
-            saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("finally-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("finally-handler")
@@ -289,7 +289,7 @@ describe("TryFinallyTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("root-start")
@@ -314,7 +314,7 @@ describe("TryFinallyTest", () => {
 
         const finallySubscription = await h.subscribe(
             finallyTopic,
-            saga("finally-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("finally-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("finally-handler")

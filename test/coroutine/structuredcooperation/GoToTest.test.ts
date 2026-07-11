@@ -30,7 +30,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-0",
                     invoke: (_scope, _message, _stepIteration) => {
@@ -91,7 +91,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-A",
                     invoke: (_scope, _message, stepIteration) => {
@@ -159,7 +159,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "self-goto-step",
                     invoke: (_scope, _message, stepIteration) => {
@@ -213,7 +213,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-A",
                     invoke: (_scope, _message, _stepIteration) => {
@@ -316,7 +316,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "loop-step",
                     invoke: async (scope, _message, stepIteration) => {
@@ -344,7 +344,7 @@ describe("GoToTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (_scope, _message) => {
                         await ciSleep(50)
@@ -423,7 +423,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-0",
                     invoke: async (scope, _message, _stepIteration) => {
@@ -467,7 +467,7 @@ describe("GoToTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("child-step")
@@ -538,7 +538,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-0",
                     invoke: async (scope, _message, _stepIteration) => {
@@ -583,7 +583,7 @@ describe("GoToTest", () => {
 
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("child-failing")
@@ -642,7 +642,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-A",
                     invoke: (_scope, _message, _stepIteration) => {
@@ -723,7 +723,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-A",
                     invoke: (_scope, _message, _stepIteration) => {
@@ -813,7 +813,7 @@ describe("GoToTest", () => {
 
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+            saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.controlledStep({
                     name: "step-A",
                     invoke: (_scope, _message, _stepIteration) => {

@@ -41,7 +41,7 @@ describe("RollbackPathTest", () => {
         const rootHandler = "root-handler"
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(rootHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { from: rootHandler })
@@ -87,7 +87,7 @@ describe("RollbackPathTest", () => {
         const rootHandler = "root-handler"
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(rootHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { from: rootHandler })
@@ -159,7 +159,7 @@ describe("RollbackPathTest", () => {
         const rootHandler = "root-handler"
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(rootHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { from: rootHandler })
@@ -181,7 +181,7 @@ describe("RollbackPathTest", () => {
         const childHandler = "child-handler"
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga(childHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(childHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("child-handler-step-1")
@@ -261,7 +261,7 @@ describe("RollbackPathTest", () => {
         const rootHandler = "root-handler"
         const rootSubscription = await h.subscribe(
             h.rootTopic,
-            saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(rootHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: async (scope, _message) => {
                         await scope.launch(h.childTopic, { from: rootHandler })
@@ -298,7 +298,7 @@ describe("RollbackPathTest", () => {
         const childHandler = "child-handler"
         const childSubscription = await h.subscribe(
             h.childTopic,
-            saga(childHandler, eventLoopStrategy(h.messageQueue), b => {
+            saga(childHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({
                     invoke: (_scope, _message) => {
                         executionOrder.push("child-handler-step-1")
@@ -383,7 +383,7 @@ describe("RollbackPathTest", () => {
         // rollbacks - 1 child2_step2_rollback + 1 root handleChildFailures
         const latch = new CountDownLatch(18)
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
             b.step({
                 invoke: (_scope, _message) => {
                     latch.countDown()
@@ -415,7 +415,7 @@ describe("RollbackPathTest", () => {
 
         const childHandler1Coroutine = saga(
             "child-handler-1",
-            eventLoopStrategy(h.messageQueue),
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
             b => {
                 b.step({
                     invoke: (_scope, _message) => {
@@ -454,7 +454,7 @@ describe("RollbackPathTest", () => {
 
         const childHandler2Coroutine = saga(
             "child-handler-2",
-            eventLoopStrategy(h.messageQueue),
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
             b => {
                 b.step({
                     invoke: (_scope, _message) => {
@@ -479,7 +479,7 @@ describe("RollbackPathTest", () => {
 
         const grandChildCoroutine = saga(
             "grandchild-handler",
-            eventLoopStrategy(h.messageQueue),
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
             b => {
                 b.step({
                     invoke: (_scope, _message) => {
@@ -829,7 +829,7 @@ describe("RollbackPathTest", () => {
 
         const latch = new CountDownLatch(16)
 
-        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+        const rootHandlerCoroutine = saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
             b.step({
                 invoke: (_scope, _message) => {
                     latch.countDown()
@@ -857,7 +857,7 @@ describe("RollbackPathTest", () => {
 
         const childHandler1Coroutine = saga(
             "child-handler-1",
-            eventLoopStrategy(h.messageQueue),
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
             b => {
                 b.step({
                     invoke: (_scope, _message) => {
@@ -893,7 +893,7 @@ describe("RollbackPathTest", () => {
 
         const childHandler2Coroutine = saga(
             "child-handler-2",
-            eventLoopStrategy(h.messageQueue),
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
             b => {
                 b.step({
                     invoke: (_scope, _message) => {
@@ -918,7 +918,7 @@ describe("RollbackPathTest", () => {
 
         const grandChildCoroutine = saga(
             "grandchild-handler",
-            eventLoopStrategy(h.messageQueue),
+            eventLoopStrategy(h.messageQueue, h.strategyEpoch),
             b => {
                 b.step({
                     invoke: (_scope, _message) => {
@@ -1381,7 +1381,7 @@ describe("RollbackPathTest", () => {
             const rootHandler = "root-handler"
             const rootSubscription = await h.subscribe(
                 h.rootTopic,
-                saga(rootHandler, eventLoopStrategy(h.messageQueue), b => {
+                saga(rootHandler, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                     b.step({
                         invoke: async (scope, _message) => {
                             await scope.launch(h.childTopic, {
@@ -1413,7 +1413,7 @@ describe("RollbackPathTest", () => {
             const childHandler1 = "child-handler-1"
             const childSubscription1 = await h.subscribe(
                 h.childTopic,
-                saga(childHandler1, eventLoopStrategy(h.messageQueue), b => {
+                saga(childHandler1, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                     b.step({
                         invoke: (_scope, message) => {
                             const phase = (message.payload as Record<string, string>).phase
@@ -1436,7 +1436,7 @@ describe("RollbackPathTest", () => {
             const childHandler2 = "child-handler-2"
             const childSubscription2 = await h.subscribe(
                 h.childTopic,
-                saga(childHandler2, eventLoopStrategy(h.messageQueue), b => {
+                saga(childHandler2, eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                     b.step({
                         invoke: (_scope, message) => {
                             const phase = (message.payload as Record<string, string>).phase
@@ -1576,7 +1576,7 @@ describe("RollbackPathTest", () => {
 
             const rootSubscription = await h.subscribe(
                 h.rootTopic,
-                saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+                saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                     b.step({
                         invoke: async (scope, _message) => {
                             await scope.launch(h.childTopic, { from: "root-handler" })
@@ -1590,7 +1590,7 @@ describe("RollbackPathTest", () => {
 
             const childSubscription = await h.subscribe(
                 h.childTopic,
-                saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+                saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                     b.step({ invoke: () => latch.countDown() })
                 }),
             )
@@ -1658,7 +1658,7 @@ describe("RollbackPathTest", () => {
 
             const rootSubscription = await h.subscribe(
                 h.rootTopic,
-                saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+                saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                     b.step({
                         invoke: async (scope, _message) => {
                             await scope.launch(h.childTopic, { from: "root-handler" })
@@ -1671,7 +1671,7 @@ describe("RollbackPathTest", () => {
 
             const childSubscription = await h.subscribe(
                 h.childTopic,
-                saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+                saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                     b.step({
                         invoke: (scope, _message) => {
                             cooperationScopeIdentifier = scope.scopeIdentifier
@@ -1743,7 +1743,7 @@ describe("RollbackPathTest", () => {
 
             const rootSubscription = await h.subscribe(
                 h.rootTopic,
-                saga("root-handler", eventLoopStrategy(h.messageQueue), b => {
+                saga("root-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                     b.step({
                         invoke: async (scope, _message) => {
                             await scope.launch(h.childTopic, { from: "root-handler" })
@@ -1763,7 +1763,7 @@ describe("RollbackPathTest", () => {
 
             const childSubscription = await h.subscribe(
                 h.childTopic,
-                saga("child-handler", eventLoopStrategy(h.messageQueue), b => {
+                saga("child-handler", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                     b.step({
                         invoke: (scope, _message) => {
                             cooperationScopeIdentifier = scope.scopeIdentifier

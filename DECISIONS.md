@@ -124,6 +124,18 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   double-encoding above — the fix routes the bind through `::text` so the string reaches the
   server verbatim and the cast happens server-side at full precision. (The Kotlin original binds
   through JDBC with microsecond-precise types, so this failure mode is port-specific.)
+- **Tests anchor `ignoreOlderThan` to the database clock** (`h.strategyEpoch`, one
+  `SELECT clock_timestamp()` at file setup; also passed to `Scoop.create` for the internal sleep
+  handler): the strategy default anchors the "ignore hierarchies older than" cutoff to the
+  client clock at saga build. Client and database clocks are calibrated at file start, but the
+  residual calibration error plus VM drift can leave the client clock a few milliseconds AHEAD
+  of the database clock — and a message launched right after the saga is built is then "older
+  than" the cutoff and permanently ignored: its SEEN row is simply never created (observed as a
+  whole-process cluster of stalls — three tests in one file run, every worker ticking "no
+  messages" while the launched messages sat in the log). The Kotlin original anchors the cutoff
+  to the client clock the same way and carries the same exposure; anchoring to the database
+  clock removes the skew term entirely. `eventLoopStrategy()` gained an optional
+  `ignoreOlderThan` parameter (default unchanged: client clock).
 - **Fixed sleeps that gate a mutation became condition polls**: three original tests wait
   `latch + Thread.sleep(100)` and then issue a cancel/rollback request that is only honoured
   "after everything has finished running". Under load the 100ms settle races the final commits

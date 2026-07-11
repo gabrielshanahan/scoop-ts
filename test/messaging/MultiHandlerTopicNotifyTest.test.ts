@@ -21,13 +21,13 @@ describe("MultiHandlerTopicNotifyTest", () => {
 
         const subA = await h.subscribe(
             h.rootTopic,
-            saga("handler-a", eventLoopStrategy(h.messageQueue), b => {
+            saga("handler-a", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({ invoke: () => latchA.countDown() })
             }),
         )
         const subB = await h.subscribe(
             h.rootTopic,
-            saga("handler-b", eventLoopStrategy(h.messageQueue), b => {
+            saga("handler-b", eventLoopStrategy(h.messageQueue, h.strategyEpoch), b => {
                 b.step({ invoke: () => latchB.countDown() })
             }),
         )
