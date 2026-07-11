@@ -38,11 +38,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # No registry-url here: it would write an .npmrc referencing NODE_AUTH_TOKEN, which is
+      # unset — publishing authenticates via npm Trusted Publishing (GitHub Actions OIDC).
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
-          registry-url: https://registry.npmjs.org
 
       - name: Install
         run: npm ci
@@ -72,10 +73,11 @@ jobs:
           CI_TIMEOUT_MULTIPLIER: 3
         timeout-minutes: 15
 
-      - name: Publish to npm
-        run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm (trusted publishing)
+        # OIDC trusted publishing needs npm >= 11.5; Node 22 ships npm 10.
+        run: |
+          npm install -g npm@latest
+          npm publish --access public --provenance
         timeout-minutes: 5
 
       - name: Stamp release notes
