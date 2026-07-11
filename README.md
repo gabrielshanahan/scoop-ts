@@ -73,6 +73,18 @@ Sleeping/scheduling (`sleepForStep`, `scheduledStep`, `periodic`), try-finally s
 and return values (`scope.storeReturnValue`/`getReturnValues`) all work exactly as in the
 original; the test suite doubles as usage documentation.
 
+## Installing
+
+```sh
+npm install scoop-ts                          # from the npm registry
+npm install github:gabrielshanahan/scoop-ts   # straight from git (builds via prepare)
+```
+
+Ships compiled ESM with type declarations plus the V1–V5 SQL migrations
+(`node_modules/scoop-ts/db/migration`, importable as `scoop-ts/db/migration/*`); apply them with
+the exported `applyMigrations(sql, dir)`. Requires Node ≥ 22; `postgres` (postgres.js) and `pino`
+come along as dependencies.
+
 ## Running the tests
 
 Requires Docker (one PostgreSQL testcontainer is started per run) and Node ≥ 22.
