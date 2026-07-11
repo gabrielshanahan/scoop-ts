@@ -1,18 +1,35 @@
 {
-  "name": "scoop",
+  "name": "scoop-ts",
   "version": "0.4.0",
   "description": "Scoop — a proof-of-concept implementation of structured cooperation for distributed, message-based systems. TypeScript port of the Kotlin/JVM original.",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielshanahan/scoop-ts.git"
+  },
+  "homepage": "https://github.com/gabrielshanahan/scoop-ts#readme",
+  "bugs": {
+    "url": "https://github.com/gabrielshanahan/scoop-ts/issues"
+  },
   "engines": {
     "node": ">=22"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./db/migration/*": "./db/migration/*"
   },
+  "files": [
+    "dist",
+    "db/migration"
+  ],
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run build",
     "test": "tsx scripts/run-tests.ts",
     "reconcile": "tsx scripts/reconcile.ts",
     "migrate": "tsx scripts/migrate.ts"
