@@ -425,6 +425,25 @@ Mechanical proof: `npm run reconcile` re-derives the inventory from the Kotlin r
 (63 main files, 195 @Test methods), checks every entry appears in this ledger with no `pending`
 status, and verifies each ported TS test file contains exactly the ledgered number of test cases.
 
-Stability: `npx tsx scripts/stability-campaign.ts` runs the full suite 20 times against one
-shared Postgres (alternating declaration order and seeded shuffles) and requires 195/0 on every
-run.
+## Stability proof
+
+The zero-flakiness bar was proven on commit `272b013` with a three-phase chain, run
+back-to-back with stop-on-first-flake semantics:
+
+1. **Whole-file soak** (`scripts/soak-file.ts`): RollbackPathTest — the file with the deepest
+   cross-saga concurrency — looped whole-file with a fresh container and debug logging for
+   2 hours: **535 iterations, 0 flakes**.
+2. **Per-test soak** (`scripts/soak-tests.ts`): every one of the 195 tests individually wrapped
+   in a loop with database cleanup on the edges and run repeatedly (5–183 iterations each,
+   time-budgeted): **195/195 clean**.
+3. **Stability campaign** (`scripts/stability-campaign.ts`): 20 full-suite runs against one
+   shared Postgres, alternating declaration order and seeded shuffles: **20/20 runs at
+   195 pass / 0 fail**.
+
+Six root-caused fixes got the suite there (all with repro evidence; details in DECISIONS.md):
+LISTEN teardown unhandled rejection, subscribe/LISTEN registration race (`Subscription.ready()`),
+`created_at` microsecond ties breaking strict step-windows (monotonic per-lineage `created_at`),
+postgres.js `::timestamptz` binds truncating to milliseconds (`::text::timestamptz`),
+client-vs-database clock skew in the ignore-older-than cutoff (DB-anchored epoch), and
+under-provisioned 1s positive-latch budgets inherited from the Kotlin original (→ the suite's
+standard 10s).

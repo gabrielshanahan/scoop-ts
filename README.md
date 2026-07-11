@@ -92,3 +92,9 @@ The suite is the Kotlin suite ported test-for-test: 195 `@Test` methods across 2
 original brief's "219" substring-counts `@TestInstance`/`@TestProfile` annotations; see
 PORT-LEDGER.md). JVM-specific tests assert the equivalent guarantee on this stack
 (JTA atomicity → `sql.begin()` atomicity; Vert.x LISTEN/NOTIFY → postgres.js LISTEN/NOTIFY).
+
+The suite is deterministic, not just green: a 2-hour whole-file soak of RollbackPathTest
+(535 iterations), a per-test soak of all 195 tests (each looped with DB cleanup on the edges),
+and 20 consecutive full-suite runs in mixed declaration/shuffled order all passed with zero
+flakes. Evidence and the six root-caused fixes behind it are in PORT-LEDGER.md ("Stability
+proof") and DECISIONS.md.
