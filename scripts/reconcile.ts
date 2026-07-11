@@ -173,5 +173,41 @@ for (const [tsFile, expectedCount] of testsByTsFile) {
     )
 }
 
+// --- 4. Port-added regression tests (outside the ported inventory) ------------------------------
+console.log("Port-added regression tests:")
+const portAddedRegex = /^### (\S+\.test\.ts) \((\d+) tests\) — port-added$/gm
+let portAddedMatch: RegExpExecArray | null
+let portAddedSections = 0
+while ((portAddedMatch = portAddedRegex.exec(ledger)) !== null) {
+    portAddedSections++
+    const tsFile = portAddedMatch[1]!
+    const declaredCount = Number(portAddedMatch[2])
+    const start = portAddedMatch.index + portAddedMatch[0].length
+    const nextSection = ledger.indexOf("\n### ", start)
+    const endOfBlock = ledger.indexOf("\n## ", start)
+    const end = Math.min(
+        nextSection === -1 ? ledger.length : nextSection,
+        endOfBlock === -1 ? ledger.length : endOfBlock,
+    )
+    const rows = [...ledger.slice(start, end).matchAll(/^\| \d+ \| (.+?) \| (\w+) \|/gm)]
+    check(
+        rows.length === declaredCount,
+        `${tsFile}: table rows (${rows.length}) match declared count (${declaredCount})`,
+    )
+    const path = join(root, tsFile)
+    if (!existsSync(path)) {
+        failures++
+        console.error(`  FAIL: missing port-added test file ${tsFile}`)
+        continue
+    }
+    const source = readFileSync(path, "utf-8")
+    const actual = [...source.matchAll(/^\s*test\(/gm)].length
+    check(
+        actual === declaredCount,
+        `${tsFile}: contains ${declaredCount} test() cases (found ${actual})`,
+    )
+}
+check(portAddedSections > 0, "ledger declares the port-added regression test section")
+
 console.log(failures === 0 ? "\nRECONCILED: everything accounted for." : `\n${failures} FAILURES`)
 process.exit(failures === 0 ? 0 : 1)

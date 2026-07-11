@@ -2,7 +2,7 @@
  * Zero-flakiness proof: runs the full suite [SCOOP_STABILITY_RUNS] times (default 20) against ONE
  * shared Postgres container, alternating between declaration order and seeded-shuffle order.
  *
- * A run only counts as green at 195 passed / 0 failed. If a run fails while the shared container
+ * A run only counts as green at 199 passed / 0 failed (195 ported + 4 port-added regressions). If a run fails while the shared container
  * is DEAD (killed from outside — e.g. a Docker Desktop restart), the container is re-provisioned
  * and that run number is retried: that is environment resilience, not test leniency. A failure
  * with a live database is a real failure and ends the campaign argument.
@@ -57,7 +57,7 @@ try {
         const pass = /pass (\d+)/.exec(output)?.[1] ?? "?"
         const fail = /fail (\d+)/.exec(output)?.[1] ?? "?"
         const seconds = Math.round((Date.now() - started) / 1000)
-        const ok = result.status === 0 && fail === "0" && pass === "195"
+        const ok = result.status === 0 && fail === "0" && pass === "199"
 
         if (!ok && !(await containerAlive())) {
             // The database was killed out from under the suite — an infrastructure event, not a

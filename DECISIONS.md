@@ -53,6 +53,10 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
 
 ## Determinism decisions
 
+The engine-level fixes in this section are each guarded by a dedicated regression test in
+`test/portregressions/PortRegressionsTest.test.ts` (deterministic reconstruction of the failure
+condition; see PORT-LEDGER.md "Port-added regression tests").
+
 - **Clock calibration against the database** (`src/node/calibrateClock.ts`): the engine's
   authoritative clock is Postgres (`CLOCK_TIMESTAMP()`), but `HandlerRegistry.eventLoopStrategy()`
   bakes a client-clock `ignoreOlderThan` cutoff into the readiness SQL. When the client clock runs
@@ -195,9 +199,16 @@ guarantee instead; the mapping for each is recorded in PORT-LEDGER.md notes:
   `new MappedKey(name, reviveElement)` takes both explicitly. Same for `Topic`, `VariableName`,
   and `Handler` names. `VariableName` keeps its polymorphic `_type` discriminator via a
   registry + `toJSON`.
-- **Preserved quirk — rollback deadline key mismatch**: the original's rollback deadline element
-  serializes under `RollbackPathDeadlineKey` (class simple name) while the generated give-up SQL
-  checks `RollbackDeadlineKey`. Reproduced as-is; do not "fix" without also changing the ref repo.
+- **Preserved quirk — rollback deadline key mismatch (a latent bug)**: the original's rollback
+  deadline element serializes under `RollbackPathDeadlineKey` (class simple name) while the
+  generated give-up SQL checks `RollbackDeadlineKey`. Consequence: the `context ?
+  'RollbackDeadlineKey'` predicate can never be true, so **rollback-path deadlines are never
+  enforced** — a rollback exceeding its deadline just keeps running (the V2 index on
+  `RollbackDeadlineKey` guards an always-empty set for the same reason). The original has zero
+  test coverage of rollback deadlines, which is how the mismatch survived. Reproduced as-is for
+  behavioral parity; fixing it means changing the key (or the SQL derivation) plus the V2 index
+  in BOTH repos together, with a new test that a missed rollback deadline actually produces
+  ROLLBACK_FAILED.
 - **Context deserialization via JSON.parse + re-stringify**: the Kotlin module reconstructs each
   top-level value's text from the token stream; here each value is `JSON.parse`d and re-emitted
   with `JSON.stringify`, which is canonical w.r.t. this codec's own output. Caveat: objects with

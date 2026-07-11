@@ -447,3 +447,26 @@ postgres.js `::timestamptz` binds truncating to milliseconds (`::text::timestamp
 client-vs-database clock skew in the ignore-older-than cutoff (DB-anchored epoch), and
 under-provisioned 1s positive-latch budgets inherited from the Kotlin original (→ the suite's
 standard 10s).
+
+## Port-added regression tests (no Kotlin counterpart)
+
+The engine-level fixes above are guarded by dedicated regression tests that construct each
+failure condition deterministically, so a regression fails outright instead of resurfacing as a
+soak flake. They live outside the ported inventory (the 195-count above is untouched); the full
+suite is therefore 199 tests.
+
+### test/portregressions/PortRegressionsTest.test.ts (4 tests) — port-added
+
+| # | Test | Status | Notes |
+|---|---|---|---|
+| 1 | engine inserts keep created_at strictly increasing per lineage | verified | µs-tie fix (GREATEST + 1µs); latent in the Kotlin original; scripts/scratch-tie-repro.ts |
+| 2 | rollback window keeps microsecond precision through the suspendedAt bind | verified | `::text::timestamptz` fix; port-specific; scripts/scratch-window-repro.ts |
+| 3 | a message published after ready() is delivered without the reconcile safety net | verified | `Subscription.ready()` contract; safety net set to 600s so it cannot rescue the test |
+| 4 | ignoreOlderThan anchored to the database clock survives client-clock skew | verified | +1s injected skew; DB-anchored cutoff; latent in the Kotlin original |
+
+Known-but-preserved (NOT regression-tested, deliberately): the rollback-path deadline key
+mismatch — the deadline element serializes under `RollbackPathDeadlineKey` while the give-up SQL
+checks `RollbackDeadlineKey`, so rollback-path deadlines can never fire. Latent in the Kotlin
+original (which has zero test coverage of rollback deadlines); preserved for behavioral parity.
+A test would only cement the broken behavior — fix it in both repos together instead (see
+DECISIONS.md "Preserved quirk").

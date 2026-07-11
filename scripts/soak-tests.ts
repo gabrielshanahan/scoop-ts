@@ -48,6 +48,24 @@ while ((sectionMatch = sectionRegex.exec(ledger)) !== null) {
         targets.push({ tsFile, testName: row[1]!, pure })
     }
 }
+// Port-added regression tests (ledger sections "### <ts file> (N tests) — port-added")
+const portAddedRegex = /^### (\S+\.test\.ts) \((\d+) tests\) — port-added$/gm
+let portAddedMatch: RegExpExecArray | null
+while ((portAddedMatch = portAddedRegex.exec(ledger)) !== null) {
+    const tsFile = portAddedMatch[1]!
+    const start = portAddedMatch.index + portAddedMatch[0].length
+    const nextSection = ledger.indexOf("\n### ", start)
+    const endOfBlock = ledger.indexOf("\n## ", start)
+    const end = Math.min(
+        nextSection === -1 ? ledger.length : nextSection,
+        endOfBlock === -1 ? ledger.length : endOfBlock,
+    )
+    const source = readFileSync(join(root, tsFile), "utf-8")
+    const pure = !source.includes("setupScoopTest")
+    for (const row of ledger.slice(start, end).matchAll(/^\| \d+ \| (.+?) \| \w+ \|/gm)) {
+        targets.push({ tsFile, testName: row[1]!, pure })
+    }
+}
 // Optional subset filter (substring match on the TS file path or the test name),
 // e.g. SOAK_ONLY=HappyPath or SOAK_ONLY="rollbacks are well behaved n-deep"
 const only = process.env.SOAK_ONLY
