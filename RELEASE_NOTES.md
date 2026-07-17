@@ -4,7 +4,7 @@ All notable changes to scoop-ts are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
-## v0.6.1 — 2026-07-17
+## Unreleased
 
 ### Changed
 
@@ -12,10 +12,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   tick, so the only cross-tick race a retry must cover is a run hidden behind FOR UPDATE SKIP
   LOCKED — one follow-up pass suffices. At three, an idle fleet paid three confirm-empty
   candidate_seens scans per wake (the bulk of abo-uat's residual 2–3 scans/s after v0.6.0).
-
-## v0.6.0 — 2026-07-17
-
-### Changed
 
 - **The drain is gated like the reconcile.** The pending-coroutine-run query (candidate_seens —
   Scoop's most expensive statement) used to run on EVERY tick of every worker; on an idle fleet
@@ -26,8 +22,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   sweep, which alone bounds the two signals Postgres never notifies about (cross-topic child
   commits and time-based wakeups; worst-case added latency = the sweep interval, default 30s).
   Direct `tick()` callers and `ReconcileGate.ALWAYS` are unaffected.
-
-## Unreleased
 
 ### Added
 
