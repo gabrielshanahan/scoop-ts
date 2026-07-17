@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## Unreleased
 
+## v0.6.0 — 2026-07-17
+
 ### Changed
 
 - **The drain's quiet tail is one pass, not three.** The drain loops until empty within a
