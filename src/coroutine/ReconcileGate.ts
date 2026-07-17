@@ -33,6 +33,15 @@
  */
 const QUIET_TICKS = 3
 
+/**
+ * The drain's quiet tail is ONE pass, not three: the drain already loops until empty WITHIN a
+ * tick (whileISaySo), so the only cross-tick race a retry must cover is a run hidden behind a
+ * sibling's FOR UPDATE SKIP LOCKED — one follow-up pass covers it, and the notify latch + safety
+ * sweep re-arm everything else. At three, an idle fleet paid 3 extra candidate_seens scans per
+ * kick (abo-uat 2026-07-17: the residual 2-3 scans/s were mostly these confirm-empty passes).
+ */
+const DRAIN_QUIET_TICKS = 1
+
 export class ReconcileGate {
     // Set by NOTIFY, consumed in shouldReconcile. Starts armed so the first tick after
     // subscribe/startup reconciles, catching messages emitted while this worker was down.
@@ -48,7 +57,7 @@ export class ReconcileGate {
     // Drain-side twin state: its own dirty latch and quiet tail (a reconcile consumes the shared
     // dirtySignal, so the drain latches its copy at markDirty time), and its own sweep timer.
     private drainDirtySignal = true
-    private drainQuietTicksRemaining = QUIET_TICKS
+    private drainQuietTicksRemaining = DRAIN_QUIET_TICKS
     private nextDrainSweepNanos: number
 
     private constructor(
@@ -92,7 +101,7 @@ export class ReconcileGate {
             insertedRows > 0 ? QUIET_TICKS : Math.max(this.quietTicksRemaining - 1, 0)
         // Fresh continuations are exactly what the drain runs — arm it.
         if (insertedRows > 0) {
-            this.drainQuietTicksRemaining = QUIET_TICKS
+            this.drainQuietTicksRemaining = DRAIN_QUIET_TICKS
         }
         this.nextSweepNanos = nowNanos + this.intervalNanos
     }
@@ -101,7 +110,7 @@ export class ReconcileGate {
     reconcileFailed(): void {
         if (this.intervalNanos > 0) {
             this.quietTicksRemaining = QUIET_TICKS
-            this.drainQuietTicksRemaining = QUIET_TICKS
+            this.drainQuietTicksRemaining = DRAIN_QUIET_TICKS
         }
     }
 
@@ -116,7 +125,7 @@ export class ReconcileGate {
         }
         if (this.drainDirtySignal) {
             this.drainDirtySignal = false
-            this.drainQuietTicksRemaining = QUIET_TICKS
+            this.drainQuietTicksRemaining = DRAIN_QUIET_TICKS
         }
         return this.drainQuietTicksRemaining > 0 || nowNanos - this.nextDrainSweepNanos >= 0
     }
@@ -131,7 +140,7 @@ export class ReconcileGate {
             return
         }
         this.drainQuietTicksRemaining = resumedAnything
-            ? QUIET_TICKS
+            ? DRAIN_QUIET_TICKS
             : Math.max(this.drainQuietTicksRemaining - 1, 0)
         this.nextDrainSweepNanos = nowNanos + this.intervalNanos
     }
@@ -139,7 +148,7 @@ export class ReconcileGate {
     /** Keeps the drain armed so a failed drain is retried on the next tick. */
     drainFailed(): void {
         if (this.intervalNanos > 0) {
-            this.drainQuietTicksRemaining = QUIET_TICKS
+            this.drainQuietTicksRemaining = DRAIN_QUIET_TICKS
         }
     }
 

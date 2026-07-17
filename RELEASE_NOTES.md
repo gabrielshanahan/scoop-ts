@@ -4,6 +4,15 @@ All notable changes to scoop-ts are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.6.1 — 2026-07-17
+
+### Changed
+
+- **The drain's quiet tail is one pass, not three.** The drain loops until empty within a
+  tick, so the only cross-tick race a retry must cover is a run hidden behind FOR UPDATE SKIP
+  LOCKED — one follow-up pass suffices. At three, an idle fleet paid three confirm-empty
+  candidate_seens scans per wake (the bulk of abo-uat's residual 2–3 scans/s after v0.6.0).
+
 ## v0.6.0 — 2026-07-17
 
 ### Changed
