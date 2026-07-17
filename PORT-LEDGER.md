@@ -460,6 +460,21 @@ failure condition deterministically, so a regression fails outright instead of r
 soak flake. They live outside the ported inventory (the 195-count above is untouched); the full
 suite is therefore 200 tests.
 
+### test/coroutine/DrainGateTest.test.ts (7 tests) — port-added
+
+The v0.6.0 drain gate (candidate_seens runs only on work signals) has no Kotlin counterpart —
+these tests cover the ReconcileGate's drain-side twin.
+
+| # | Test | Status | Notes |
+|---|---|---|---|
+| 1 | ALWAYS always drains regardless of state | verified | |
+| 2 | starts armed, drains a bounded quiet tail, then goes idle | verified | |
+| 3 | markDirty re-arms the drain independently of reconcile consuming its signal | verified | |
+| 4 | a productive reconcile arms the drain | verified | |
+| 5 | a drain that resumed something stays armed; empty drains go quiet | verified | |
+| 6 | the safety sweep forces a drain even with no signals | verified | |
+| 7 | drainFailed re-arms | verified | |
+
 ### test/portregressions/PortRegressionsTest.test.ts (5 tests) — port-added
 
 | # | Test | Status | Notes |
