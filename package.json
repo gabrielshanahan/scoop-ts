@@ -1,6 +1,6 @@
 {
   "name": "scoop-ts",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Scoop — a proof-of-concept implementation of structured cooperation for distributed, message-based systems. TypeScript port of the Kotlin/JVM original.",
   "license": "BSD-3-Clause",
   "type": "module",

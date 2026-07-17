@@ -4,6 +4,20 @@ All notable changes to scoop-ts are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.6.0 — 2026-07-17
+
+### Changed
+
+- **The drain is gated like the reconcile.** The pending-coroutine-run query (candidate_seens —
+  Scoop's most expensive statement) used to run on EVERY tick of every worker; on an idle fleet
+  of dozens of workers those scans were the database's single biggest steady load (abo-uat:
+  3.5 average active sessions, individual scans 10s+ under pressure). The ReconcileGate now
+  carries a drain-side twin: a tick drains only when a notification arrived, a reconcile pass
+  inserted continuations, or the previous drain resumed something — plus the same safety-net
+  sweep, which alone bounds the two signals Postgres never notifies about (cross-topic child
+  commits and time-based wakeups; worst-case added latency = the sweep interval, default 30s).
+  Direct `tick()` callers and `ReconcileGate.ALWAYS` are unaffected.
+
 ## Unreleased
 
 ### Added

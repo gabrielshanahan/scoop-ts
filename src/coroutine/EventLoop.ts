@@ -181,6 +181,14 @@ export class EventLoop {
                 }
             }
 
+            // The drain (candidate_seens — Scoop's most expensive statement) is gated the same
+            // way reconcile is: only when a signal says there might be work, plus the safety
+            // sweep (which alone bounds the two signals Postgres never notifies about:
+            // cross-topic child commits and time-based wakeups).
+            if (!reconcileGate.shouldDrain()) {
+                return
+            }
+            let resumedAnything = false
             await whileISaySo(async (repeatCount, saySo) => {
                 await this.transactionRunner.inStepTransaction(async connection => {
                     try {
@@ -201,11 +209,15 @@ export class EventLoop {
                         }
                         const messageId = coroutineState.message.id
                         // Honour an in-effect infrastructure-failure backoff: leave the run
-                        // pending and end this tick so it is retried on a later tick.
+                        // pending and end this tick so it is retried on a later tick. The run
+                        // still EXISTS, so keep the drain armed — its retry cadence must not
+                        // silently stretch to the safety sweep.
                         if (this.isBackedOff(messageId)) {
+                            resumedAnything = true
                             return
                         }
                         saySo()
+                        resumedAnything = true
                         let continuationResult: ContinuationResult
                         try {
                             continuationResult = await this.resumeCoroutine(
@@ -238,7 +250,10 @@ export class EventLoop {
                     }
                 })
             })
+            reconcileGate.drainCompleted(resumedAnything)
         } catch (e) {
+            // Re-arm the drain: whatever failed, the safe assumption is that work remains.
+            reconcileGate.drainFailed()
             // Ticks racing application shutdown throw at connection acquisition time — expected,
             // not actionable.
             if (isShuttingDown()) {
