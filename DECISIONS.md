@@ -245,3 +245,15 @@ condition; see PORT-LEDGER.md "Port-added regression tests").
 - **`PGobject`** (JDBC's JSONB carrier) — postgres.js returns JSONB columns as parsed JS values
   already; where the Kotlin API surface exposes `PGobject` (e.g. return values), the TS API exposes
   the parsed JSON value.
+- **Settled flag on SEEN rows** (deliberate schema/behavior addition, not in the Kotlin
+  original): `message_event.settled_at` (V6) stamps a handler's SEEN when its terminal event
+  (COMMITTED / ROLLED_BACK / ROLLBACK_FAILED) is written — same statement, so the flag can never
+  lag — and is cleared when a ROLLING_BACK re-activates the lineage (both write paths: the
+  event-loop's `mark` inserts and the reconcile CTE). `candidate_seens` filters
+  `settled_at IS NULL`, turning dispatch from O(retained history) into O(active sagas): the
+  original re-derived "is this saga finished?" from raw events on every poll, which on a live
+  deployment (abo-uat, 2026-07-18) made the poll queries ~97% of all database time, scaling with
+  the log-retention window. The original readiness branches remain in the query as the
+  correctness authority for rows that pass the filter, and `repairSettledFlags`
+  (SettledFlag.ts) restores both drift directions from the event log on the consumer's
+  maintenance cadence — a bookkeeping bug degrades to a bounded delay instead of a silent stall.

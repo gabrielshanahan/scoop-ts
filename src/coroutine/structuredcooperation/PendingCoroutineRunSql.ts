@@ -49,6 +49,11 @@ export const candidateSeens: SQL = {
                 AND rollback_emitted.type = 'ROLLBACK_EMITTED'
         WHERE seen.coroutine_name = :coroutine_name
           AND seen.type = 'SEEN'
+          -- Settledness is maintained on the row (V6__seen_settled_flag): terminal events stamp
+          -- settled_at in the same statement that writes them, ROLLING_BACK clears it. This
+          -- filter is what makes dispatch O(active sagas) instead of O(retained history); the
+          -- branches below stay as the correctness authority for the rows that pass.
+          AND seen.settled_at IS NULL
           AND (
           ((rollback_emitted.id IS NULL AND rolling_back.id IS NULL) AND
             NOT EXISTS (
