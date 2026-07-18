@@ -13,6 +13,9 @@ import { buildSql, finalSelect } from "./PendingCoroutineRunSql.js"
 
 const log = logger("MessageEventRepository")
 
+/** Event types that mark a handler's saga run as finished — they stamp the SEEN's settled_at. */
+const SETTLING_EVENT_TYPES = new Set(["COMMITTED", "ROLLED_BACK", "ROLLBACK_FAILED"])
+
 /**
  * Repository for the `message_event` log — the append-only table that makes structured
  * cooperation possible. Ported 1:1 from the Kotlin original; SQL preserved verbatim (named
@@ -206,23 +209,45 @@ export class MessageEventRepository {
         nextStep: number | null,
     ): Promise<void> {
         await asScoopInfrastructure(async () => {
-            await queryNamed(
-                connection,
-                `INSERT INTO message_event (message_id, type, coroutine_name, coroutine_identifier, step, cooperation_lineage, exception, context, child_failure_handler_iteration, next_step, created_at)
-                VALUES (:messageId, :messageEventType::message_event_type, :coroutineName, :coroutineIdentifier, :stepName, :cooperationLineage::uuid[], :exception::jsonb, :context::jsonb, :childFailureHandlerIteration, :nextStep, GREATEST(CLOCK_TIMESTAMP(), COALESCE((SELECT max(created_at) FROM message_event WHERE cooperation_lineage = :cooperationLineage::uuid[]) + INTERVAL '1 microsecond', CLOCK_TIMESTAMP())))`,
-                {
-                    messageId,
-                    messageEventType,
-                    coroutineName,
-                    coroutineIdentifier,
-                    stepName,
-                    cooperationLineage: uuidArrayLiteral(cooperationLineage),
-                    exception: exception ? this.jsonbHelper.toJsonbParam(exception) : null,
-                    context: this.contextParam(context),
-                    childFailureHandlerIteration,
-                    nextStep,
-                },
-            )
+            const insert = `INSERT INTO message_event (message_id, type, coroutine_name, coroutine_identifier, step, cooperation_lineage, exception, context, child_failure_handler_iteration, next_step, created_at)
+                VALUES (:messageId, :messageEventType::message_event_type, :coroutineName, :coroutineIdentifier, :stepName, :cooperationLineage::uuid[], :exception::jsonb, :context::jsonb, :childFailureHandlerIteration, :nextStep, GREATEST(CLOCK_TIMESTAMP(), COALESCE((SELECT max(created_at) FROM message_event WHERE cooperation_lineage = :cooperationLineage::uuid[]) + INTERVAL '1 microsecond', CLOCK_TIMESTAMP())))`
+            // Settledness bookkeeping (V6__seen_settled_flag): a terminal event stamps the
+            // handler's SEEN as settled, a ROLLING_BACK re-activates it. Chained onto the INSERT
+            // in the SAME statement so the flag normally can't lag the event it reflects. The
+            // SEEN is addressed by (coroutine_name, message_id, type) — unique_seen_handler_msg.
+            //
+            // The flag update must NEVER WAIT for the SEEN's row lock: ROLLING_BACK and
+            // ROLLBACK_FAILED are written in a SEPARATE transaction while the main tick
+            // transaction still holds that row FOR UPDATE (seenForProcessing) and is itself
+            // awaiting this write — a plain UPDATE deadlocks the process (observed: whole test
+            // suite hung). FOR UPDATE SKIP LOCKED skips the contended row; a skipped transition
+            // is healed by the reconcile pass's unsettle CTE and repairSettledFlags.
+            const settledUpdate = (newValue: string, currentGuard: string): string =>
+                `WITH ins AS (${insert} RETURNING message_id)
+                 UPDATE message_event seen SET settled_at = ${newValue}
+                 WHERE seen.id IN (
+                     SELECT s.id FROM message_event s JOIN ins ON s.message_id = ins.message_id
+                     WHERE s.type = 'SEEN' AND s.coroutine_name = :coroutineName
+                       AND s.settled_at ${currentGuard}
+                     FOR UPDATE SKIP LOCKED
+                 )`
+            const sql = SETTLING_EVENT_TYPES.has(messageEventType)
+                ? settledUpdate("CLOCK_TIMESTAMP()", "IS NULL")
+                : messageEventType === "ROLLING_BACK"
+                  ? settledUpdate("NULL", "IS NOT NULL")
+                  : insert
+            await queryNamed(connection, sql, {
+                messageId,
+                messageEventType,
+                coroutineName,
+                coroutineIdentifier,
+                stepName,
+                cooperationLineage: uuidArrayLiteral(cooperationLineage),
+                exception: exception ? this.jsonbHelper.toJsonbParam(exception) : null,
+                context: this.contextParam(context),
+                childFailureHandlerIteration,
+                nextStep,
+            })
         })
     }
 
@@ -459,6 +484,48 @@ export class MessageEventRepository {
                     FROM rollback_emitted_missing_rolling_back
                     ON CONFLICT (coroutine_name, message_id, type) WHERE type = 'ROLLING_BACK' DO NOTHING
                     RETURNING id
+                ),
+                -- A ROLLING_BACK re-activates the handler's settled SEEN (V6__seen_settled_flag):
+                -- clear the stamp so the dispatch query's settled filter lets the rollback run.
+                -- Two forms are needed. This one covers the ROLLING_BACKs inserted BY THIS PASS
+                -- (data-modifying CTEs can't see each other's rows, so it drives from the same
+                -- SELECT set the insert used). Never waits: a row locked by another worker is
+                -- skipped and healed by the second form on a later pass.
+                rolling_back_unsettle AS (
+                    UPDATE message_event seen
+                    SET settled_at = NULL
+                    WHERE seen.id IN (
+                        SELECT s.id FROM message_event s
+                        JOIN rollback_emitted_missing_rolling_back r ON s.message_id = r.message_id
+                        WHERE s.type = 'SEEN'
+                          AND s.coroutine_name = :coroutine_name
+                          AND s.settled_at IS NOT NULL
+                        FOR UPDATE SKIP LOCKED
+                    )
+                ),
+                -- ...and this form covers PRE-EXISTING ROLLING_BACKs whose unsettle was skipped:
+                -- the event-loop writes ROLLING_BACK in a separate transaction while the main
+                -- tick transaction holds the SEEN's row lock, so the writer-side flag update
+                -- (insertMessageEvent) can legitimately skip it. Driven from the coroutine's
+                -- ROLLING_BACK rows (normally zero), so it costs an index probe.
+                stale_rolling_back_unsettle AS (
+                    UPDATE message_event seen
+                    SET settled_at = NULL
+                    WHERE seen.id IN (
+                        SELECT s.id FROM message_event rb
+                        JOIN message_event s ON s.type = 'SEEN'
+                            AND s.coroutine_name = rb.coroutine_name
+                            AND s.message_id = rb.message_id
+                        WHERE rb.type = 'ROLLING_BACK'
+                          AND rb.coroutine_name = :coroutine_name
+                          AND s.settled_at IS NOT NULL
+                          AND NOT EXISTS (
+                              SELECT 1 FROM message_event t
+                              WHERE t.cooperation_lineage = s.cooperation_lineage
+                                AND t.type IN ('ROLLED_BACK', 'ROLLBACK_FAILED')
+                          )
+                        FOR UPDATE OF s SKIP LOCKED
+                    )
                 )
                 -- Report how many rows were actually inserted. The caller's reconciliation gate
                 -- uses this to keep reconciling across ticks until a pass drains (inserts nothing).
