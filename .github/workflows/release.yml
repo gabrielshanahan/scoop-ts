@@ -40,7 +40,7 @@ jobs:
 
       # No registry-url here: it would write an .npmrc referencing NODE_AUTH_TOKEN, which is
       # unset — publishing authenticates via npm Trusted Publishing (GitHub Actions OIDC).
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
